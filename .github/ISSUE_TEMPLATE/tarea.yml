@@ -39,11 +39,10 @@ body:
       label: Etapa / Milestone
       description: Seleccioná a qué etapa del trabajo pertenece esta tarea
       options:
-        - Etapa 1 - Clases básicas
-        - Etapa 2 - SRP
-        - Etapa 3 - OCP
-        - Etapa 4 - LSP
-        - Etapa 5 - ArrayList
+        - Etapa 1 - Diseño Base y Principios SOLID
+        - Etapa 2 - Gestión de Recursos y Colecciones
+        - Etapa 3 - Sistema de Préstamos y Reservas
+        - Etapa 4 - Reportes y Análisis
     validations:
       required: true
 
