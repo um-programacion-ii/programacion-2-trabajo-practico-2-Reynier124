@@ -14,11 +14,13 @@ public class Consola {
     private Scanner scanner;
     private List<Usuario> usuarios;
     private List<RecursoDigital> recursos;
+    private final ServicioNotificaciones notificaciones;
 
-    public Consola() {
+    public Consola(ServicioNotificaciones servicio) {
         scanner = new Scanner(System.in);
         usuarios = new ArrayList<>();
         recursos = new ArrayList<>();
+        this.notificaciones = servicio;
     }
 
     public void iniciar() {
@@ -50,8 +52,8 @@ public class Consola {
         String email = leerTexto("Email: ");
         String password = leerTexto("Password: ");
         Usuario nuevo = new Usuario(nombre, email, password);
-        usuarios.add(nuevo);
-        System.out.println("Usuario creado: " + nuevo);
+        usuarios.add(nuevo);;
+        notificaciones.notificar("Usuario creado: " + nuevo);
     }
 
     private void agregarRecurso() {
@@ -62,10 +64,8 @@ public class Consola {
         System.out.println("3. Audiolibro");
         System.out.println("0. Volver");
         int tipo = leerEntero("Seleccione tipo de recurso: ");
-        if (tipo != 1 || tipo != 2 || tipo != 3) {
-            System.out.println("Tipo invalido. Intentelo de nuevo");
-        } else if (tipo == 0) {
-            iniciar();
+        if (0 == tipo) {
+            System.out.println("Volviendo...");
         }else {
             String titulo = leerTexto("Título del libro: ");
             String estado = leerTexto("Estado (Disponible/Prestado): ");
@@ -73,14 +73,17 @@ public class Consola {
                 case 1 -> {
                     int cant_paginas = leerEntero("Cantidad de paginas: ");
                     recursos.add(new Libro(estado, titulo, cant_paginas));
+                    notificaciones.notificar("El libro ha sido creado con éxito");
                 }
                 case 2 -> {
                     String periocidad = leerTexto("Periocidad: ");
                     recursos.add(new Revista(estado, titulo, periocidad));
+                    notificaciones.notificar("La revista ha sido creada con éxito");
                 }
                 case 3 -> {
                     String duracion = leerTexto("Duracion: ");
                     recursos.add(new Audiolibro(estado, titulo, duracion));
+                    notificaciones.notificar("El audiolibro ha sido creado con éxito");
                 }
             }
 
