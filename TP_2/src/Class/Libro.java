@@ -3,8 +3,9 @@ package Class;
 public class Libro extends RecursoDigital{
     private int cant_paginas;
 
-    public Libro(int id, String estado, String titulo) {
-        super(id, estado, titulo);
+    public Libro(String estado, String titulo, int cant_paginas) {
+        super(estado, titulo);
+        this.cant_paginas = cant_paginas;
     }
 
     public int getCant_paginas() {

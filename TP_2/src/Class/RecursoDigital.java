@@ -5,8 +5,8 @@ public abstract class RecursoDigital {
     private final int id;
     private String estado;
 
-    public RecursoDigital(int id, String estado, String titulo) {
-        this.id = id;
+    public RecursoDigital(String estado, String titulo) {
+        this.id = IdGenerator.generateUniqueId(RecursoDigital.class);
         this.estado = estado;
         this.titulo = titulo;
     }

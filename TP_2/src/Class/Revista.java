@@ -1,10 +1,11 @@
 package Class;
 
-public class Revista extends Audiolibro{
+public class Revista extends RecursoDigital{
     private String periodicidad;
 
-    public Revista(int id, String estado, String titulo) {
-        super(id, estado, titulo);
+    public Revista(String estado, String titulo, String periodicidad) {
+        super(estado, titulo);
+        this.periodicidad = periodicidad;
     }
 
     public String getPeriodicidad() {

@@ -3,8 +3,9 @@ package Class;
 public class Audiolibro extends RecursoDigital{
     private String duracion;
 
-    public Audiolibro(int id, String estado, String titulo) {
-        super(id, estado, titulo);
+    public Audiolibro(String estado, String titulo, String duracion) {
+        super(estado, titulo);
+        this.duracion = duracion;
     }
 
     public String getDuracion() {
