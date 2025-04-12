@@ -1,9 +1,9 @@
-package Class;
+package Recurso;
 
-public class Libro extends RecursoDigital{
+public class Libro extends RecursoDigital {
     private int cant_paginas;
 
-    public Libro(String estado, String titulo, int cant_paginas) {
+    public Libro(Estado estado, String titulo, int cant_paginas) {
         super(estado, titulo);
         this.cant_paginas = cant_paginas;
     }

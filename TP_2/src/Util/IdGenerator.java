@@ -1,4 +1,4 @@
-package Class;
+package Util;
 
 import java.util.*;
 

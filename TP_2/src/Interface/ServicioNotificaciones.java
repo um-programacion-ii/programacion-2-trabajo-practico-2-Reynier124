@@ -1,4 +1,4 @@
-package Class;
+package Interface;
 
 public interface ServicioNotificaciones {
     void notificar(String msg);

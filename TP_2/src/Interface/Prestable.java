@@ -1,7 +1,7 @@
-package Class;
+package Interface;
 
 import java.time.LocalDateTime;
-import Class.Usuario;
+import Usuario.Usuario;
 
 public interface Prestable {
     boolean estaDisponible();

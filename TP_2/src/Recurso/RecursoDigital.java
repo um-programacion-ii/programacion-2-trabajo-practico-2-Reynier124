@@ -1,11 +1,13 @@
-package Class;
+package Recurso;
+
+import Util.IdGenerator;
 
 public abstract class RecursoDigital {
     private String titulo;
     private final int id;
-    private String estado;
+    private Estado estado;
 
-    public RecursoDigital(String estado, String titulo) {
+    public RecursoDigital(Estado estado, String titulo) {
         this.id = IdGenerator.generateUniqueId(RecursoDigital.class);
         this.estado = estado;
         this.titulo = titulo;
@@ -23,19 +25,19 @@ public abstract class RecursoDigital {
         return id;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
     @Override
     public String toString() {
         return  "id=" + id +
-                ", titulo='" + titulo +
-                ", estado='" + estado;
+                ", titulo=" + titulo +
+                ", estado=" + estado;
     }
 }
 
