@@ -1,4 +1,6 @@
-package Class;
+package Util;
+
+import Interface.ServicioNotificaciones;
 
 public class ServicioNotificacionesEmail implements ServicioNotificaciones {
 

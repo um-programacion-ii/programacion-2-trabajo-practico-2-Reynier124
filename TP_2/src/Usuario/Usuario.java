@@ -1,4 +1,6 @@
-package Class;
+package Usuario;
+
+import Util.IdGenerator;
 
 public class Usuario {
     private String nombre;
@@ -43,10 +45,10 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "nombre='" + nombre + '\'' +
+        return "nombre=" + nombre +
                 ", id=" + String.format("%06d", id) +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'';
+                ", email=" + email +
+                ", password=" + password;
     }
 
 

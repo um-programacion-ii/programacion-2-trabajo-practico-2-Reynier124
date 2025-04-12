@@ -1,9 +1,9 @@
-package Class;
+package Recurso;
 
-public class Revista extends RecursoDigital{
+public class Revista extends RecursoDigital {
     private String periodicidad;
 
-    public Revista(String estado, String titulo, String periodicidad) {
+    public Revista(Estado estado, String titulo, String periodicidad) {
         super(estado, titulo);
         this.periodicidad = periodicidad;
     }

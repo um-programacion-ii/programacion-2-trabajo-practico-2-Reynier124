@@ -1,9 +1,7 @@
 package Main;
 
-import Class.Usuario;
-import Class.Consola;
-import Class.ServicioNotificaciones;
-import Class.ServicioNotificacionesEmail;
+import Interface.ServicioNotificaciones;
+import Util.ServicioNotificacionesEmail;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,9 +1,9 @@
-package Class;
+package Recurso;
 
-public class Audiolibro extends RecursoDigital{
+public class Audiolibro extends RecursoDigital {
     private String duracion;
 
-    public Audiolibro(String estado, String titulo, String duracion) {
+    public Audiolibro(Estado estado, String titulo, String duracion) {
         super(estado, titulo);
         this.duracion = duracion;
     }
