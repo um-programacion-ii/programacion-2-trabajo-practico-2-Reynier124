@@ -6,14 +6,13 @@ import Usuario.Usuario;
 import java.util.*;
 
 public class GestorUsuarios {
-    //private List<Usuario> usuarios;
     private Map<String, Usuario> usuarios;
     private final Scanner sc;
     private final Input ip;
     private final ServicioNotificaciones notificaciones;
 
     public GestorUsuarios(Scanner sc, ServicioNotificaciones notificaciones) {
-        usuarios = Collections.emptyMap();
+        usuarios = new HashMap<>();
         this.sc = sc;
         this.ip = new Input(sc);
         this.notificaciones = notificaciones;
@@ -34,7 +33,6 @@ public class GestorUsuarios {
         String password = ip.leerTexto("Password: ");
         Usuario nuevo = new Usuario(nombre, email, password);
         usuarios.put(nombre, nuevo);
-        //usuarios.add(nuevo);;
         notificaciones.notificar("Usuario creado: " + nuevo);
     }
 }
