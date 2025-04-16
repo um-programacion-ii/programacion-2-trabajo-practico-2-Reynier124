@@ -1,10 +1,13 @@
 package Recurso;
 
-public class Revista extends RecursoDigital {
+import Enum.EstadoRecurso;
+import Enum.Categoria;
+
+public class Revista extends RecursoBase {
     private String periodicidad;
 
-    public Revista(Estado estado, String titulo, String periodicidad) {
-        super(estado, titulo);
+    public Revista(EstadoRecurso estado, String titulo, Categoria categoria, String periodicidad) {
+        super(estado, titulo,categoria);
         this.periodicidad = periodicidad;
     }
 

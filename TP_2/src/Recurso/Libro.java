@@ -1,10 +1,13 @@
 package Recurso;
 
-public class Libro extends RecursoDigital {
+import Enum.EstadoRecurso;
+import Enum.Categoria;
+
+public class Libro extends RecursoBase {
     private int cant_paginas;
 
-    public Libro(Estado estado, String titulo, int cant_paginas) {
-        super(estado, titulo);
+    public Libro(EstadoRecurso estado, String titulo, Categoria categoria, int cant_paginas) {
+        super(estado, titulo, categoria);
         this.cant_paginas = cant_paginas;
     }
 

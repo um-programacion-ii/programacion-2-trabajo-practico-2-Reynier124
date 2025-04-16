@@ -4,18 +4,14 @@ import Interface.ServicioNotificaciones;
 import Usuario.Usuario;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class GestorUsuarios {
+public class GestorUsuarios extends Gestor {
     private Map<String, Usuario> usuarios;
-    private final Scanner sc;
-    private final Input ip;
-    private final ServicioNotificaciones notificaciones;
 
     public GestorUsuarios(Scanner sc, ServicioNotificaciones notificaciones) {
+        super(sc, notificaciones);
         usuarios = new HashMap<>();
-        this.sc = sc;
-        this.ip = new Input(sc);
-        this.notificaciones = notificaciones;
     }
 
     public Map<String, Usuario> getUsuarios() {
@@ -26,7 +22,8 @@ public class GestorUsuarios {
         this.usuarios = usuarios;
     }
 
-    public void crearUsuario() {
+    @Override
+    public void crear() {
         System.out.println("\n--- CREAR USUARIO ---");
         String nombre = ip.leerTexto("Nombre: ");
         String email = ip.leerTexto("Email: ");
@@ -34,5 +31,17 @@ public class GestorUsuarios {
         Usuario nuevo = new Usuario(nombre, email, password);
         usuarios.put(nombre, nuevo);
         notificaciones.notificar("Usuario creado: " + nuevo);
+    }
+
+    public Map<String, Usuario> busquedaNombre(String nombre) {
+        return usuarios.entrySet().stream()
+                .filter(entry -> entry.getKey().equalsIgnoreCase(nombre))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public Map<String, Usuario> busquedaId(int id) {
+        return usuarios.entrySet().stream()
+                .filter(entry -> entry.getValue().getId() == id)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
