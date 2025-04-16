@@ -1,10 +1,13 @@
 package Recurso;
 
-public class Audiolibro extends RecursoDigital {
+import Enum.EstadoRecurso;
+import Enum.Categoria;
+
+public class Audiolibro extends RecursoBase {
     private String duracion;
 
-    public Audiolibro(Estado estado, String titulo, String duracion) {
-        super(estado, titulo);
+    public Audiolibro(EstadoRecurso estado, String titulo, Categoria categoria, String duracion) {
+        super(estado, titulo, categoria);
         this.duracion = duracion;
     }
 

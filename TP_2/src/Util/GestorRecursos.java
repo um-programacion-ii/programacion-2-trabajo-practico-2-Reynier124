@@ -1,23 +1,22 @@
 package Util;
 
+import Enum.Categoria;
+import Enum.EstadoRecurso;
+import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Recurso.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class GestorRecursos {
+public class GestorRecursos extends Gestor {
     private List<RecursoDigital> recursos;
-    private Scanner sc;
-    private Input ip;
-    private final ServicioNotificaciones notificaciones;
 
     public GestorRecursos(Scanner sc, ServicioNotificaciones notificaciones) {
+        super(sc, notificaciones);
         recursos = new ArrayList<>();
-        this.sc = sc;
-        this.ip = new Input(sc);
-        this.notificaciones = notificaciones;
     }
 
     public List<RecursoDigital> getRecursos() {
@@ -28,7 +27,8 @@ public class GestorRecursos {
         this.recursos = recursos;
     }
 
-    public void agregarRecurso() {
+    @Override
+    public void crear() {
         System.out.println("\n--- AGREGAR RECURSO ---");
         System.out.println("Tipos disponibles:");
         System.out.println("1. Libro");
@@ -40,21 +40,22 @@ public class GestorRecursos {
             System.out.println("Volviendo...");
         }else {
             String titulo = ip.leerTexto("Título del libro: ");
-            Estado estado = leerEnum();
+            EstadoRecurso estado = ip.leerEnumEstado();
+            Categoria categoria = ip.leerEnumCategoria();
             switch (tipo){
                 case 1 -> {
                     int cant_paginas = ip.leerEntero("Cantidad de paginas: ");
-                    recursos.add(new Libro(estado, titulo, cant_paginas));
+                    recursos.add(new Libro(estado, titulo,categoria, cant_paginas));
                     notificaciones.notificar("El libro ha sido creado con éxito");
                 }
                 case 2 -> {
                     String periocidad = ip.leerTexto("Periocidad: ");
-                    recursos.add(new Revista(estado, titulo, periocidad));
+                    recursos.add(new Revista(estado, titulo,categoria, periocidad));
                     notificaciones.notificar("La revista ha sido creada con éxito");
                 }
                 case 3 -> {
                     String duracion = ip.leerTexto("Duracion: ");
-                    recursos.add(new Audiolibro(estado, titulo, duracion));
+                    recursos.add(new Audiolibro(estado, titulo, categoria, duracion));
                     notificaciones.notificar("El audiolibro ha sido creado con éxito");
                 }
             }
@@ -63,20 +64,16 @@ public class GestorRecursos {
 
     }
 
-    public Estado leerEnum(){
-        Estado estado = null;
-        System.out.println("Estados disponibles:");
-        for (Estado e : Estado.values()) {
-            System.out.println("- " + e);
-        }
-        while (estado == null) {
-            String estadoTexto = ip.leerTexto("Ingrese el estado: ").toUpperCase();
-            try {
-                estado = Estado.valueOf(estadoTexto);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Estado inválido. Intente nuevamente.");
-            }
-        }
-        return estado;
+    public List<RecursoDigital> busquedaTitulo(String titulo){
+        return recursos.stream()
+                .filter(entry -> entry.getTitulo().equalsIgnoreCase(titulo))
+                .collect(Collectors.toList());
     };
+
+    public List<RecursoDigital> busquedaCategoria(String categoria){
+        return recursos.stream()
+                .filter(entry -> entry.getCategoria().toString().equalsIgnoreCase(categoria))
+                .collect(Collectors.toList());
+    };
+
 }

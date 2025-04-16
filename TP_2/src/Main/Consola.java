@@ -1,7 +1,7 @@
 package Main;
 
 import Interface.ServicioNotificaciones;
-import Recurso.RecursoDigital;
+import Interface.RecursoDigital;
 import Util.GestorRecursos;
 import Util.GestorUsuarios;
 import Util.Input;
@@ -29,8 +29,8 @@ public class Consola {
             mostrarMenuPrincipal();
             opcion = ip.leerEntero("Seleccione una opción: ");
             switch (opcion) {
-                case 1 -> gu.crearUsuario();
-                case 2 -> gr.agregarRecurso();
+                case 1 -> gu.crear();
+                case 2 -> gr.crear();
                 case 3 -> listarRecursos();
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opción inválida.");

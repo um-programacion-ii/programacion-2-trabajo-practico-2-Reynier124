@@ -1,6 +1,6 @@
-package Recurso;
+package Enum;
 
-public enum Estado {
+public enum EstadoRecurso {
     DISPONIBLE,
     PRESTADO,
     RESERVADO,
