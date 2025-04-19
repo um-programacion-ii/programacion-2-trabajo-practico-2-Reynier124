@@ -2,6 +2,7 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
+import Interface.RecursoVisitor;
 
 public class Audiolibro extends RecursoBase {
     private String duracion;
@@ -10,13 +11,17 @@ public class Audiolibro extends RecursoBase {
         super(estado, titulo, categoria);
         this.duracion = duracion;
     }
-
     public String getDuracion() {
         return duracion;
     }
 
     public void setDuracion(String duracion) {
         this.duracion = duracion;
+    }
+
+    @Override
+    public void accept(RecursoVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

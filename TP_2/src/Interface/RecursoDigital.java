@@ -11,4 +11,6 @@ public interface RecursoDigital {
     void setCategoria(Categoria categoria);
     String getTitulo();
     void setTitulo(String titulo);
+
+    void accept(RecursoVisitor visitor);
 }

@@ -1,5 +1,7 @@
 package Main;
 
+import Excepciones.RecursoNoDisponibleException;
+import Excepciones.UsuarioNoEncontradoException;
 import Interface.ServicioNotificaciones;
 import Interface.RecursoDigital;
 import Util.GestorRecursos;
@@ -29,9 +31,8 @@ public class Consola {
             mostrarMenuPrincipal();
             opcion = ip.leerEntero("Seleccione una opción: ");
             switch (opcion) {
-                case 1 -> gu.crear();
-                case 2 -> gr.crear();
-                case 3 -> listarRecursos();
+                case 1 -> gestionarUsuarios();
+                case 2 -> gestionarRecursos();
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opción inválida.");
             }
@@ -40,10 +41,72 @@ public class Consola {
 
     private void mostrarMenuPrincipal() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
-        System.out.println("1. Crear Usuario");
-        System.out.println("2. Agregar Recurso Digital");
-        System.out.println("3. Listar Recursos Digitales");
+        System.out.println("1. Sistema de usuarios");
+        System.out.println("2. Sistema de recursos");
         System.out.println("0. Salir");
+    }
+
+    private void mostrarMenuRecursos() {
+        System.out.println("\n--- MENÚ RECURSOS ---");
+        System.out.println("1. Crear Recurso");
+        System.out.println("2. Buscar Recurso");
+        System.out.println("3. Ordenar Lista de Recursos");
+        System.out.println("4. Listar recursos");
+        System.out.println("0. Salir");
+    }
+
+    private void gestionarRecursos() {
+        int opcion;
+        do {
+            mostrarMenuRecursos();
+            opcion = ip.leerEntero("Seleccione una opción: ");
+            try {
+                switch (opcion) {
+                    case 0 -> System.out.println("Saliendo...");
+                    case 1 -> gr.crear();
+                    case 2 -> gr.buscar();
+                    case 3 -> gr.ordenar();
+                    case 4 -> listarRecursos();
+                    default -> System.out.println("Opción inválida. Intente nuevamente.");
+                }
+            } catch (RecursoNoDisponibleException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+            }
+        } while (opcion != 0);
+    }
+
+
+    private void mostrarMenuUsuarios() {
+        System.out.println("\n--- MENÚ USUARIOS ---");
+        System.out.println("1. Crear Usuario");
+        System.out.println("2. Buscar Usuario");
+        System.out.println("3. Ordenar Lista de Usuarios");
+        System.out.println("4. Listar Usuarios");
+        System.out.println("0. Salir");
+    }
+
+    private void gestionarUsuarios() {
+        int opcion;
+        do {
+            mostrarMenuUsuarios();
+            opcion = ip.leerEntero("Seleccione una opcion: ");
+            try{
+                switch (opcion) {
+                    case 0 -> System.out.println("Saliendo...");
+                    case 1 -> gu.crear();
+                    case 2 -> gu.buscar();
+                    case 3 -> gu.ordenar();
+                    case 4 -> gu.listarUsuarios(gu.getUsuarios());
+                    default -> System.out.println("Opcion invalida. Intente nuevamente.");
+                }
+            }catch (UsuarioNoEncontradoException e){
+                System.out.println("Error: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+            }
+        }while (opcion != 0);
     }
 
     private void listarRecursos() {

@@ -2,6 +2,7 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
+import Interface.RecursoVisitor;
 
 public class Revista extends RecursoBase {
     private String periodicidad;
@@ -17,6 +18,11 @@ public class Revista extends RecursoBase {
 
     public void setPeriodicidad(String periodicidad) {
         this.periodicidad = periodicidad;
+    }
+
+    @Override
+    public void accept(RecursoVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

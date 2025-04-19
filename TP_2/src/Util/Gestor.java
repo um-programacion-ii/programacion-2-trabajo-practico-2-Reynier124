@@ -15,6 +15,4 @@ public abstract class Gestor {
         this.notificaciones = notificaciones;
     }
 
-    public abstract void crear();
-
 }

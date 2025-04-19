@@ -28,6 +28,20 @@ public class Input {
         return valor;
     }
 
+    public Integer leerEnteroOpcional(String mensaje) {
+        System.out.print(mensaje);
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.println("Por favor, introduzca un número entero válido o deje en blanco.");
+            return leerEnteroOpcional(mensaje);
+        }
+    }
+
     public EstadoRecurso leerEnumEstado(){
         EstadoRecurso estado = null;
         System.out.println("Estados disponibles:");
@@ -44,6 +58,20 @@ public class Input {
         }
         return estado;
     };
+
+    public EstadoRecurso leerEnumEstadoOpcional(String mensaje) {
+        System.out.print(mensaje);
+        String estadoTexto = scanner.nextLine().trim().toUpperCase();
+        if (estadoTexto.isEmpty()) {
+            return null;
+        }
+        try {
+            return EstadoRecurso.valueOf(estadoTexto);
+        } catch (IllegalArgumentException e) {
+            System.out.println("EstadoRecurso inválido. Intente nuevamente.");
+            return leerEnumEstadoOpcional(mensaje);
+        }
+    }
 
     public Categoria leerEnumCategoria() {
         Categoria categoria = null;

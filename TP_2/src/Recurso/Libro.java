@@ -2,6 +2,7 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
+import Interface.RecursoVisitor;
 
 public class Libro extends RecursoBase {
     private int cant_paginas;
@@ -17,6 +18,11 @@ public class Libro extends RecursoBase {
 
     public void setCant_paginas(int cant_paginas) {
         this.cant_paginas = cant_paginas;
+    }
+
+    @Override
+    public void accept(RecursoVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override
