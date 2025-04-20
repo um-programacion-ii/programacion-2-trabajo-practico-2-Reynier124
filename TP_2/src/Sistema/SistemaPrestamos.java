@@ -8,10 +8,7 @@ import Usuario.Usuario;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 public class SistemaPrestamos {
     private final BlockingQueue<Prestamo> colaSolicitudes;
@@ -61,20 +58,38 @@ public class SistemaPrestamos {
     }
 
     public void agregarObservador(PrestamoObserver o) {
-        observadores.add(o);
+        synchronized (observadores) {
+            observadores.add(o);
+        }
     }
 
     public void eliminarObservador(PrestamoObserver o) {
-        observadores.remove(o);
+        synchronized (observadores) {
+            observadores.add(o);
+        }
     }
 
     private void notificarObservadores(Prestamo prestamo) {
-        for (PrestamoObserver o : observadores) {
-            o.actualizar(prestamo);
+        synchronized (observadores) {
+            for (PrestamoObserver o : observadores) {
+                o.actualizar(prestamo);
+            }
         }
     }
 
     public void cerrar() {
-        procesadorPrestamos.shutdown();
+        try {
+            procesadorPrestamos.shutdown();
+            if (!procesadorPrestamos.awaitTermination(1, TimeUnit.SECONDS)) {
+                procesadorPrestamos.shutdownNow();
+
+                if (!procesadorPrestamos.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println("Algunas tareas no se terminaron correctamente.");
+                }
+            }
+        } catch (InterruptedException e) {
+            procesadorPrestamos.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

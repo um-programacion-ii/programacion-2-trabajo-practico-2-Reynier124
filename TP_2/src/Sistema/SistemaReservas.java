@@ -10,10 +10,7 @@ import Enum.EstadoRecurso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.*;
 
 public class SistemaReservas {
     private PriorityBlockingQueue<Reservas> colaReservas;
@@ -45,7 +42,7 @@ public class SistemaReservas {
     }
 
 
-    public void agregarReserva(Usuario usuario, Prestable recurso, int prioridad) throws RecursoNoDisponibleException {
+    public synchronized void agregarReserva(Usuario usuario, Prestable recurso, int prioridad) throws RecursoNoDisponibleException {
         if (recurso.estaDisponible()){
             Reservas reserva = new Reservas(usuario, recurso, prioridad);
             colaReservas.put(reserva);
@@ -64,20 +61,38 @@ public class SistemaReservas {
     }
 
     public void agregarObservador(ReservaObserver o) {
-        observadores.add(o);
+        synchronized (observadores) {
+            observadores.add(o);
+        }
     }
 
     public void eliminarObservador(ReservaObserver o) {
-        observadores.remove(o);
+        synchronized (observadores) {
+            observadores.remove(o);
+        }
     }
 
     private void notificarObservadores(Reservas reserva) {
-        for (ReservaObserver o : observadores) {
-            o.actualizar(reserva);
+        synchronized (observadores) {
+            for (ReservaObserver o : observadores) {
+                o.actualizar(reserva);
+            }
         }
     }
 
     public void cerrar() {
-        procesadorReservas.shutdown();
+        try {
+            procesadorReservas.shutdown();
+            if (!procesadorReservas.awaitTermination(1, TimeUnit.SECONDS)) {
+                procesadorReservas.shutdownNow();
+
+                if (!procesadorReservas.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println("Algunas tareas no se terminaron correctamente.");
+                }
+            }
+        } catch (InterruptedException e) {
+            procesadorReservas.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

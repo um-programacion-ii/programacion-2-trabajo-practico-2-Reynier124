@@ -18,7 +18,7 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
     private final int id;
     private EstadoRecurso estado;
     private Categoria categoria;
-    private List<RecursoObserver> observadores = new ArrayList<>();
+    private final List<RecursoObserver> observadores = new ArrayList<>();
 
 
     public RecursoBase(EstadoRecurso estado, String titulo, Categoria categoria) {
@@ -60,16 +60,22 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
     }
 
     public void agregarObservador(RecursoObserver observador) {
-        observadores.add(observador);
+        synchronized (observadores) {
+            observadores.add(observador);
+        }
     }
 
     public void eliminarObservador(RecursoObserver observador) {
-        observadores.remove(observador);
+        synchronized (observadores) {
+            observadores.remove(observador);
+        }
     }
 
-    private void notificarObservadores() {
-        for (RecursoObserver observador : observadores) {
-            observador.actualizar(this);
+    public void notificarObservadores() {
+        synchronized (observadores) {
+            for (RecursoObserver observador : observadores) {
+                observador.actualizar(this);
+            }
         }
     }
 
