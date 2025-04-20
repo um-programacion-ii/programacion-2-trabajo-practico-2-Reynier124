@@ -1,4 +1,4 @@
-package Util;
+package Comparadores;
 
 import Interface.RecursoDigital;
 

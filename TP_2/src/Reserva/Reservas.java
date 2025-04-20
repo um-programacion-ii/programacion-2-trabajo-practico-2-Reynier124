@@ -1,5 +1,6 @@
 package Reserva;
 
+import Interface.Prestable;
 import Interface.RecursoDigital;
 import Usuario.Usuario;
 
@@ -7,11 +8,11 @@ import java.util.Date;
 
 public class Reservas implements Comparable<Reservas> {
     private Usuario usuario;
-    private RecursoDigital recurso;
+    private Prestable recurso;
     private Date fechaReserva;
     private int prioridad;
 
-    public Reservas(Usuario usuario, RecursoDigital recurso, int prioridad) {
+    public Reservas(Usuario usuario, Prestable recurso, int prioridad) {
         this.usuario = usuario;
         this.recurso = recurso;
         this.fechaReserva = new Date();
@@ -26,11 +27,11 @@ public class Reservas implements Comparable<Reservas> {
         this.usuario = usuario;
     }
 
-    public RecursoDigital getRecurso() {
+    public Prestable getRecurso() {
         return recurso;
     }
 
-    public void setRecurso(RecursoDigital recurso) {
+    public void setRecurso(Prestable recurso) {
         this.recurso = recurso;
     }
 

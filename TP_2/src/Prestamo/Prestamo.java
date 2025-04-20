@@ -1,73 +1,54 @@
 package Prestamo;
 
-import Interface.RecursoDigital;
+import Interface.Prestable;
 import Usuario.Usuario;
-import Enum.EstadoRecurso;
 
-import java.util.Date;
-
+import java.time.LocalDateTime;
 
 public class Prestamo {
-    private Usuario usuario;
-    private RecursoDigital recurso;
-    private Date fechaPrestamo;
-    private Date fechaDevolucion;
+    private final Usuario usuario;
+    private final Prestable recurso;
+    private LocalDateTime fechaEntrega;
+    private LocalDateTime fechaDevolucion;
 
-    public Prestamo(Usuario usuario, RecursoDigital recurso) {
+    public Prestamo(Usuario usuario, Prestable recurso, LocalDateTime fechaDevolucion) {
         this.usuario = usuario;
         this.recurso = recurso;
-        this.fechaPrestamo = new Date();
-        this.fechaDevolucion = null;
+        this.fechaEntrega = LocalDateTime.now();
+        this.fechaDevolucion = fechaDevolucion;
     }
 
     public Usuario getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public RecursoDigital getRecurso() {
+    public Prestable getRecurso() {
         return recurso;
     }
 
-    public void setRecurso(RecursoDigital recurso) {
-        this.recurso = recurso;
+    public LocalDateTime getFechaEntrega() {
+        return fechaEntrega;
     }
 
-    public Date getFechaPrestamo() {
-        return fechaPrestamo;
+    public void setFechaEntrega(LocalDateTime fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
     }
 
-    public void setFechaPrestamo(Date fechaPrestamo) {
-        this.fechaPrestamo = fechaPrestamo;
-    }
-
-    public Date getFechaDevolucion() {
+    public LocalDateTime getFechaDevolucion() {
         return fechaDevolucion;
     }
 
-    public void setFechaDevolucion(Date fechaDevolucion) {
+    public void setFechaDevolucion(LocalDateTime fechaDevolucion) {
         this.fechaDevolucion = fechaDevolucion;
     }
 
-    public void realizarPrestamo() {
-        if (recurso.getEstado() == EstadoRecurso.DISPONIBLE) {
-            recurso.setEstado(EstadoRecurso.PRESTADO);
-            System.out.println("Préstamo realizado con éxito.");
-        } else {
-            System.out.println("El recurso no está disponible para préstamo.");
-        }
-    }
-
-    public void realizarDevolucion() {
-        if (recurso.getEstado() == EstadoRecurso.PRESTADO) {
-            recurso.setEstado(EstadoRecurso.DISPONIBLE);
-            this.fechaDevolucion = new Date();
-            System.out.println("Devolución realizada con éxito.");
-        } else {
-            System.out.println("El recurso no está prestado.");
-        }
+    @Override
+    public String toString() {
+        return "Prestamo{" +
+                "usuario=" + usuario +
+                ", recurso=" + recurso +
+                ", fechaEntrega=" + fechaEntrega +
+                ", fechaDevolucion=" + fechaDevolucion +
+                '}';
     }
 }
