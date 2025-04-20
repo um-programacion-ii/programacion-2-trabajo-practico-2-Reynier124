@@ -2,20 +2,23 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
+import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.RecursoVisitor;
-import Interface.Observer;
+import Observer.RecursoObserver;
+import Usuario.Usuario;
 import Util.IdGenerator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RecursoBase implements RecursoDigital {
+public abstract class RecursoBase implements RecursoDigital, Prestable {
     private String titulo;
     private final int id;
     private EstadoRecurso estado;
     private Categoria categoria;
-    private List<Observer> observadores = new ArrayList<>();
+    private List<RecursoObserver> observadores = new ArrayList<>();
 
 
     public RecursoBase(EstadoRecurso estado, String titulo, Categoria categoria) {
@@ -56,21 +59,41 @@ public abstract class RecursoBase implements RecursoDigital {
         this.categoria = categoria;
     }
 
-    public void agregarObservador(Observer observador) {
+    public void agregarObservador(RecursoObserver observador) {
         observadores.add(observador);
     }
 
-    public void eliminarObservador(Observer observador) {
+    public void eliminarObservador(RecursoObserver observador) {
         observadores.remove(observador);
     }
 
     private void notificarObservadores() {
-        for (Observer observador : observadores) {
+        for (RecursoObserver observador : observadores) {
             observador.actualizar(this);
         }
     }
 
     public abstract void accept(RecursoVisitor visitor);
+
+    @Override
+    public boolean estaDisponible() {
+        return estado == EstadoRecurso.DISPONIBLE;
+    }
+
+    @Override
+    public LocalDateTime getFechaDevolucion() {
+        return LocalDateTime.now().plusDays(14);
+    }
+
+    @Override
+    public void prestar(Usuario usuario) {
+        setEstado(EstadoRecurso.PRESTADO);
+    }
+
+    @Override
+    public void reservar(){
+        setEstado(EstadoRecurso.RESERVADO);
+    }
 
     @Override
     public String toString() {

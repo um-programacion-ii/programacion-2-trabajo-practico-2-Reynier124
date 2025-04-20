@@ -1,20 +1,23 @@
-package Util;
+package Gestor;
 
 import Excepciones.RecursoNoDisponibleException;
 import Excepciones.UsuarioNoEncontradoException;
 import Interface.ServicioNotificaciones;
+import Sistema.SistemaNotificaciones;
 import Usuario.Usuario;
-import Util.ComparadorUsuarioNombre;
+import Comparadores.ComparadorUsuarioNombre;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GestorUsuarios extends Gestor {
     private Map<String, Usuario> usuarios;
+    private final SistemaNotificaciones sistemaNotificaciones;
 
-    public GestorUsuarios(Scanner sc, ServicioNotificaciones notificaciones) {
+    public GestorUsuarios(Scanner sc, ServicioNotificaciones notificaciones, SistemaNotificaciones sistemaNotificaciones) {
         super(sc, notificaciones);
         usuarios = new LinkedHashMap<>();
+        this.sistemaNotificaciones = sistemaNotificaciones;
     }
 
     public Map<String, Usuario> getUsuarios() {
@@ -25,24 +28,30 @@ public class GestorUsuarios extends Gestor {
         this.usuarios = usuarios;
     }
 
-
-    public void crear() throws RecursoNoDisponibleException {
+    @Override
+    public void crear(){
         System.out.println("\n--- CREAR USUARIO ---");
         String nombre = ip.leerTexto("Nombre: ");
-        if (usuarios.values().stream().anyMatch(r -> r.getNombre().equalsIgnoreCase(nombre))) {
-            throw new RecursoNoDisponibleException("El usuario con el nombre '" + nombre + "' ya existe.");
+        try{
+            if (usuarios.values().stream().anyMatch(r -> r.getNombre().equalsIgnoreCase(nombre))) {
+                throw new RecursoNoDisponibleException("El usuario con el nombre '" + nombre + "' ya existe.");
+            }
+            String email = ip.leerTexto("Email: ");
+            if (usuarios.values().stream().anyMatch(r -> r.getEmail().equalsIgnoreCase(email))) {
+                throw new RecursoNoDisponibleException("El usuario con el email '" + email + "' ya existe.");
+            }
+            String password = ip.leerTexto("Password: ");
+            Usuario nuevo = new Usuario(nombre, email, password);
+            usuarios.put(nombre, nuevo);
+            sistemaNotificaciones.notificarCreacionUsuario(nuevo);
+        }catch (RecursoNoDisponibleException e){
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado:" + e.getMessage());
         }
-        String email = ip.leerTexto("Email: ");
-        if (usuarios.values().stream().anyMatch(r -> r.getEmail().equalsIgnoreCase(email))) {
-            throw new RecursoNoDisponibleException("El usuario con el email '" + email + "' ya existe.");
-        }
-        String password = ip.leerTexto("Password: ");
-        Usuario nuevo = new Usuario(nombre, email, password);
-        usuarios.put(nombre, nuevo);
-        notificaciones.notificar("Usuario creado: " + nuevo);
     }
-
-    public void buscar() throws UsuarioNoEncontradoException {
+    @Override
+    public void buscar(){
         String nombre = null;
         Integer id = null;
         String email = null;
@@ -56,8 +65,15 @@ public class GestorUsuarios extends Gestor {
         email = ip.leerTexto("Email: ");
         password = ip.leerTexto("Password: ");
 
-        Map<String, Usuario> resultados = buscarUsuarios(nombre, id, email, password);
-        listarUsuarios(resultados);
+        try {
+            Map<String, Usuario> resultados = buscarUsuarios(nombre, id, email, password);
+            listarUsuarios(resultados);
+        } catch (UsuarioNoEncontradoException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado:" + e.getMessage());
+        }
+
     };
 
     public Map<String, Usuario> buscarUsuarios(String nombre, Integer id, String email, String password) throws UsuarioNoEncontradoException {
@@ -80,12 +96,13 @@ public class GestorUsuarios extends Gestor {
         }
     };
 
+    @Override
     public void ordenar(){
         int opcion;
         do {
-            System.out.println("\n--- ORDENAR DE RECURSOS ---");
-            System.out.println("1. Ordenar de forma ascendente");
-            System.out.println("2. Ordenar de forma descendente");
+            System.out.println("\n--- ORDENAR DE USUARIOS ---");
+            System.out.println("1. Ordenar Nombre de forma ascendente");
+            System.out.println("2. Ordenar Nombre de forma descendente");
             System.out.println("0. Salir");
             opcion = ip.leerEntero("Opcion: ");
             switch(opcion){

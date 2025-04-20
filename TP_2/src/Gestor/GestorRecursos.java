@@ -1,4 +1,4 @@
-package Util;
+package Gestor;
 
 import Enum.Categoria;
 import Enum.EstadoRecurso;
@@ -6,6 +6,9 @@ import Excepciones.RecursoNoDisponibleException;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Recurso.*;
+import Comparadores.ComparadorRecursoTitulo;
+import Sistema.SistemaNotificaciones;
+import Util.RecursoSearchVisitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,10 +18,12 @@ import java.util.stream.Collectors;
 
 public class GestorRecursos extends Gestor {
     private List<RecursoDigital> recursos;
+    private final SistemaNotificaciones sistemaNotificaciones;
 
-    public GestorRecursos(Scanner sc, ServicioNotificaciones notificaciones) {
+    public GestorRecursos(Scanner sc, ServicioNotificaciones notificaciones, SistemaNotificaciones sistemaNotificaciones) {
         super(sc, notificaciones);
         recursos = new ArrayList<>();
+        this.sistemaNotificaciones = sistemaNotificaciones;
     }
 
     public List<RecursoDigital> getRecursos() {
@@ -29,7 +34,8 @@ public class GestorRecursos extends Gestor {
         this.recursos = recursos;
     }
 
-    public void crear() throws RecursoNoDisponibleException {
+    @Override
+    public void crear(){
         int tipo;
         do {
             System.out.println("\n--- AGREGAR RECURSO ---");
@@ -42,11 +48,18 @@ public class GestorRecursos extends Gestor {
             if (0 == tipo) {
                 System.out.println("Volviendo...");
             }else if(tipo > 0 && tipo < 4) {
-                String titulo = ip.leerTexto("Título del libro: ");
-                if (recursos.stream().anyMatch(r -> r.getTitulo().equalsIgnoreCase(titulo))) {
-                    throw new RecursoNoDisponibleException("El recurso con el título '" + titulo + "' ya existe.");
+                try{
+                    String titulo = ip.leerTexto("Título del libro: ");
+                    if (recursos.stream().anyMatch(r -> r.getTitulo().equalsIgnoreCase(titulo))) {
+                        throw new RecursoNoDisponibleException("El recurso con el título '" + titulo + "' ya existe.");
+                    }
+                    crearRecurso(tipo, titulo);
+                }catch (RecursoNoDisponibleException e) {
+                    System.out.println("Error: " + e.getMessage());
+                } catch (Exception e) {
+                    System.out.println("Ocurrió un error inesperado: " + e.getMessage());
                 }
-                crearRecurso(tipo, titulo);
+
             }else {
                 System.out.println("No es ninguna de las opciones. Intente de nuevo.");
             }
@@ -77,7 +90,8 @@ public class GestorRecursos extends Gestor {
         }
     };
 
-    public void buscar() throws RecursoNoDisponibleException {
+    @Override
+    public void buscar(){
         String titulo = null;
         String categoria = null;
         EstadoRecurso estado = null;
@@ -94,9 +108,15 @@ public class GestorRecursos extends Gestor {
         cantPaginas = ip.leerEnteroOpcional("Cantidad de páginas (solo para libros): ");
         periodicidad = ip.leerTexto("Periodicidad (solo para revistas): ");
         duracion = ip.leerTexto("Duración (solo para audiolibros): ");
+        try{
+            List<RecursoDigital> resultados = buscarRecursos(titulo, categoria, estado, cantPaginas, periodicidad, duracion);
+            listarRecursos(resultados);
+        } catch (RecursoNoDisponibleException e) {
+            System.out.println("Error: " + e.getMessage());
+        }catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+        }
 
-        List<RecursoDigital> resultados = buscarRecursos(titulo, categoria, estado, cantPaginas, periodicidad, duracion);
-        listarRecursos(resultados);
     }
 
     public List<RecursoDigital> buscarRecursos(String titulo, String categoria,EstadoRecurso estado, Integer cantPaginas, String periodicidad, String duracion) throws RecursoNoDisponibleException {
@@ -114,13 +134,14 @@ public class GestorRecursos extends Gestor {
         return resultados;
     };
 
-    private void listarRecursos(List<RecursoDigital> recursos) {
+    public void listarRecursos(List<RecursoDigital> recursos) {
         System.out.println("\n--- LISTA DE RECURSOS ---");
         for (RecursoDigital recurso : recursos) {
             System.out.println(recurso.toString());
         }
     }
 
+    @Override
     public void ordenar(){
         int opcion;
         do {

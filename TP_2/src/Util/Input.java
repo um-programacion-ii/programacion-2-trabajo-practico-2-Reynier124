@@ -2,7 +2,10 @@ package Util;
 
 import Enum.Categoria;
 import Enum.EstadoRecurso;
+import Usuario.Usuario;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Input {
@@ -42,7 +45,7 @@ public class Input {
         }
     }
 
-    public EstadoRecurso leerEnumEstado(){
+    public EstadoRecurso leerEnumEstado() {
         EstadoRecurso estado = null;
         System.out.println("Estados disponibles:");
         for (EstadoRecurso e : EstadoRecurso.values()) {
@@ -57,7 +60,9 @@ public class Input {
             }
         }
         return estado;
-    };
+    }
+
+    ;
 
     public EstadoRecurso leerEnumEstadoOpcional(String mensaje) {
         System.out.print(mensaje);
@@ -89,4 +94,18 @@ public class Input {
         }
         return categoria;
     }
+
+    public LocalDate leerFechaOpcional(String mensaje) {
+        System.out.print(mensaje);
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) return null;
+        try {
+            return LocalDate.parse(input);
+        } catch (DateTimeParseException e) {
+            System.out.println("Formato incorrecto. Use: yyyy-MM-dd");
+            return leerFechaOpcional(mensaje);
+        }
+    }
+
 }
+
