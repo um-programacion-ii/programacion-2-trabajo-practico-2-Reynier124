@@ -2,6 +2,7 @@ package Interface;
 
 import Enum.Categoria;
 import Enum.EstadoRecurso;
+import Observer.RecursoObserver;
 
 public interface RecursoDigital {
     int getId();
@@ -13,4 +14,8 @@ public interface RecursoDigital {
     void setTitulo(String titulo);
 
     void accept(RecursoVisitor visitor);
+
+    void agregarObservador(RecursoObserver observador);
+    void eliminarObservador(RecursoObserver observador);
+    void notificarObservadores();
 }

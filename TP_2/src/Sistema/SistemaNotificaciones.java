@@ -3,6 +3,7 @@ package Sistema;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
+import Observer.RecursoObserver;
 import Prestamo.Prestamo;
 import Recurso.RecursoBase;
 import Reserva.Reservas;
@@ -10,8 +11,9 @@ import Usuario.Usuario;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class SistemaNotificaciones {
+public class SistemaNotificaciones implements RecursoObserver {
     private final ExecutorService executorService;
     private final ServicioNotificaciones servicioNotificaciones;
 
@@ -74,6 +76,22 @@ public class SistemaNotificaciones {
     }
 
     public void cerrar() {
-        executorService.shutdown();
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+                if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println("Algunas tareas no se terminaron correctamente.");
+                }
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    @Override
+    public void actualizar(RecursoDigital recurso) {
+        servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ahora esta disponible.");
     }
 }
