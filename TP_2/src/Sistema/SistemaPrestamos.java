@@ -15,11 +15,13 @@ public class SistemaPrestamos {
     private final ExecutorService procesadorPrestamos;
     private final List<PrestamoObserver> observadores = new ArrayList<>();
     private final SistemaNotificaciones sistemaNotificaciones;
+    private final SistemaVencimientos sistemaVencimientos;
 
     public SistemaPrestamos(SistemaNotificaciones sistemaNotificaciones, int hilos) {
         this.colaSolicitudes = new LinkedBlockingQueue<>();
         this.procesadorPrestamos = Executors.newFixedThreadPool(hilos);
         this.sistemaNotificaciones = sistemaNotificaciones;
+        this.sistemaVencimientos = new SistemaVencimientos(hilos);
         iniciarProcesamiento();
     }
 
