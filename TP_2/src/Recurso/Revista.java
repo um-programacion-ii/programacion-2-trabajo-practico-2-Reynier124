@@ -25,6 +25,8 @@ public class Revista extends RecursoBase {
         visitor.visit(this);
     }
 
+
+
     @Override
     public String toString() {
         return super.toString() + ", periocidad=" + periodicidad;

@@ -3,9 +3,12 @@ package Gestor;
 import Excepciones.RecursoNoDisponibleException;
 import Excepciones.UsuarioNoEncontradoException;
 import Interface.ServicioNotificaciones;
+import Observer.RecursoObserver;
 import Sistema.SistemaNotificaciones;
 import Util.Input;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class GestorBiblioteca {
@@ -16,12 +19,14 @@ public class GestorBiblioteca {
     private GestorPrestamos gPrestamo;
 
     public GestorBiblioteca(Scanner scanner, ServicioNotificaciones servicioNotificacion,int hilos) {
+        List<RecursoObserver> observers = new ArrayList<>();
         this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, 3);
+        observers.add(gNotificacion);
         this.gUsuario = new GestorUsuarios(scanner, servicioNotificacion, gNotificacion);
-        this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, gNotificacion);
+        this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, observers);
         this.gReserva = new GestorReservas(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
         this.gPrestamo = new GestorPrestamos(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
-
+        gRecurso.getObservadores().add(gPrestamo);
     }
 
     public void crear(String opcion) throws RecursoNoDisponibleException {
