@@ -36,7 +36,7 @@ public class ReporteGenerator {
 
         System.out.println("Reporte de Recursos Más Reservados:");
         for (RecursoBase recurso : recursosOrdenados) {
-            System.out.println("Recurso: " + recurso.getTitulo() + ", Prestamos: " + recurso.getConteoPrestamos());
+            System.out.println("Recurso: " + recurso.getTitulo() + ", Reservas: " + recurso.getConteoReservas());
         }
     }
 
