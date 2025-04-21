@@ -1,5 +1,6 @@
 package Gestor;
 
+import Enum.EstadoRecurso;
 import Comparadores.ComparadorPrestamoFechaDevolucion;
 import Comparadores.ComparadorPrestamoFechaEntrega;
 import Comparadores.ComparadorRecursoTitulo;
@@ -54,6 +55,16 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
         }
 
         notificaciones.notificar("Prestamo creado con exito");
+    }
+
+    public void solicitarPrestamo(RecursoDigital recurso) {
+        System.out.println("\n--- CREAR PRESTAMO ---");
+        Usuario usuario = conseguirUsuario();
+        try{
+            sistemaPrestamos.solicitarPrestamo(usuario, (Prestable) recurso);
+        }catch (RecursoNoDisponibleException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
@@ -215,7 +226,10 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
 
     @Override
     public void actualizar(Prestamo prestamo) {
-        prestamos.add(prestamo);
+        RecursoDigital recurso = (RecursoDigital) prestamo.getRecurso();
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO){
+            prestamos.add(prestamo);
+        }
     }
 
     public void listarPrestamos(List<Prestamo> prestamos) {

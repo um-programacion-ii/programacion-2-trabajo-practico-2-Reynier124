@@ -3,6 +3,7 @@ package Gestor;
 import Excepciones.RecursoNoDisponibleException;
 import Excepciones.UsuarioNoEncontradoException;
 import Interface.ServicioNotificaciones;
+import Sistema.SistemaDisponibilidad;
 import Sistema.SistemaNotificaciones;
 import Util.Input;
 
@@ -14,6 +15,7 @@ public class GestorBiblioteca {
     private GestorReservas gReserva;
     private SistemaNotificaciones gNotificacion;
     private GestorPrestamos gPrestamo;
+    private SistemaDisponibilidad gDisponibilidad;
 
     public GestorBiblioteca(Scanner scanner, ServicioNotificaciones servicioNotificacion,int hilos) {
         this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, 3);
@@ -21,7 +23,7 @@ public class GestorBiblioteca {
         this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, gNotificacion);
         this.gReserva = new GestorReservas(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
         this.gPrestamo = new GestorPrestamos(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
-
+        this.gDisponibilidad = new SistemaDisponibilidad(gNotificacion, gPrestamo);
     }
 
     public void crear(String opcion) throws RecursoNoDisponibleException {
