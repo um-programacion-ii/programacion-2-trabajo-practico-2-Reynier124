@@ -10,21 +10,20 @@ import Util.Input;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 public class SistemaVencimientos {
     private final BlockingQueue<Prestamo> colaPrestamos;
     private final ExecutorService procesadorVencimientos;
     private Input input;
+    private final SistemaNotificaciones notificaciones;
 
 
-    public SistemaVencimientos(int hilos) {
+    public SistemaVencimientos(SistemaNotificaciones notifaciones, int hilos) {
         this.colaPrestamos = new LinkedBlockingQueue<>();
         this.procesadorVencimientos = Executors.newFixedThreadPool(hilos);
         this.input = new Input(new Scanner(System.in));
+        this.notificaciones = notifaciones;
         iniciarProcesamiento();
     }
 
@@ -65,12 +64,15 @@ public class SistemaVencimientos {
     private void alertaVencimientos(Prestamo prestamo){
         Prestable recurso = prestamo.getRecurso();
         Usuario usuario = prestamo.getUsuario();
-        System.out.println("****************************************");
-        System.out.println("ALERTA: El préstamo vence mañana.");
-        System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-        System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-        System.out.println("Usuario: " + usuario.getNombre());
-        System.out.println("****************************************");
+        if (notificaciones.getPreferencia().isNotificarWarning()){
+            System.out.println("****************************************");
+            System.out.println("ALERTA: El préstamo vence mañana.");
+            System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+            System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+            System.out.println("Usuario: " + usuario.getNombre());
+            System.out.println("****************************************");
+        }
+
 
         renovacionPrestamo(prestamo);
     }
@@ -93,14 +95,37 @@ public class SistemaVencimientos {
     }
 
     public void avisoVencimiento(Prestamo prestamo){
-        Prestable recurso = prestamo.getRecurso();
-        Usuario usuario = prestamo.getUsuario();
-        System.out.println("****************************************");
-        System.out.println("ALERTA: Ha vencido");
-        System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-        System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-        System.out.println("Usuario: " + usuario.getNombre());
-        System.out.println("****************************************");
+        if (notificaciones.getPreferencia().isNotificarError()){
+            Prestable recurso = prestamo.getRecurso();
+            Usuario usuario = prestamo.getUsuario();
+            System.out.println("****************************************");
+            System.out.println("ALERTA: Ha vencido");
+            System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+            System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+            System.out.println("Usuario: " + usuario.getNombre());
+            System.out.println("****************************************");
+        }
+
+    }
+
+    public BlockingQueue<Prestamo> getColaPrestamos() {
+        return colaPrestamos;
+    }
+
+    public void cerrar(){
+        try {
+            procesadorVencimientos.shutdown();
+            if (!procesadorVencimientos.awaitTermination(1, TimeUnit.SECONDS)) {
+                procesadorVencimientos.shutdownNow();
+
+                if (!procesadorVencimientos.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println("Algunas tareas no se terminaron correctamente.");
+                }
+            }
+        } catch (InterruptedException e) {
+            procesadorVencimientos.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

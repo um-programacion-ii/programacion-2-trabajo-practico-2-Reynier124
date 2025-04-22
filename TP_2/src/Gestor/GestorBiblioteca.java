@@ -10,7 +10,6 @@ import Observer.RecursoObserver;
 import Prestamo.Prestamo;
 import Recurso.RecursoBase;
 import Reserva.Reservas;
-import Sistema.SistemaNotificaciones;
 import Usuario.Usuario;
 import Util.Input;
 
@@ -20,23 +19,24 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class GestorBiblioteca {
-    private GestorUsuarios gUsuario;
-    private GestorRecursos gRecurso;
-    private GestorReservas gReserva;
-    private SistemaNotificaciones gNotificacion;
-    private GestorPrestamos gPrestamo;
+    private final GestorUsuarios gUsuario;
+    private final GestorRecursos gRecurso;
+    private final GestorReservas gReserva;
+    private final SistemaNotificaciones gNotificacion;
+    private final GestorPrestamos gPrestamo;
     private SistemaDisponibilidad gDisponibilidad;
-    private Input input;
+    private final Input input;
 
     public GestorBiblioteca(Scanner scanner, ServicioNotificaciones servicioNotificacion,int hilos) {
         List<RecursoObserver> observers = new ArrayList<>();
-        this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, hilos);
+        this.input = new Input(scanner);
+        this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, pedirPrefrencias(),hilos);
         observers.add(gNotificacion);
         this.gUsuario = new GestorUsuarios(scanner, servicioNotificacion, gNotificacion);
         this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, observers);
         this.gReserva = new GestorReservas(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
         this.gPrestamo = new GestorPrestamos(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
-        this.input = new Input(scanner);
+
         this.gDisponibilidad = new SistemaDisponibilidad(gNotificacion, gPrestamo);
         gRecurso.getObservadores().add(gPrestamo);
 
@@ -98,13 +98,17 @@ public class GestorBiblioteca {
 
     public List<Usuario> conseguirUsuarios(){
         Map<String, Usuario> usuarios = gUsuario.getUsuarios();
+        return new ArrayList<>(usuarios.values());
+    }
+    /*
+    public List<Usuario> conseguirUsuarios(){
+        Map<String, Usuario> usuarios = gUsuario.getUsuarios();
         List<Usuario> usuarioList = new ArrayList<>();
-        for (Usuario usuario : usuarios.values()) {
-            usuarioList.add(usuario);
-        }
+        usuarioList.addAll(usuarios.values());
         return usuarioList;
     }
-
+    */
+    //Comprobar funcionamiento de esta función
     public List<RecursoBase> conseguirRecursos(){
         List<RecursoBase> lista1 = conseguirRecursosPrestamos();
         List<RecursoBase> lista2 = conseguirRecursosReservas();
@@ -124,7 +128,7 @@ public class GestorBiblioteca {
         System.out.println("Configura tus preferencias de notificación:");
         String decision = input.leerTexto("¿Deseas recibir notificaciones de tipo INFO? (s/n): ").toLowerCase();
         comprobarPrefrencia(decision, "info" , preferencias);
-        decision = input.leerTexto("\"¿Deseas recibir notificaciones de tipo WARNING? (s/n): ").toLowerCase();
+        decision = input.leerTexto("¿Deseas recibir notificaciones de tipo WARNING? (s/n): ").toLowerCase();
         comprobarPrefrencia(decision, "warning" , preferencias);
         decision = input.leerTexto("¿Deseas recibir notificaciones de tipo ERROR? (s/n): ").toLowerCase();
         comprobarPrefrencia(decision, "error" , preferencias);
@@ -148,5 +152,15 @@ public class GestorBiblioteca {
             case "warning" -> {preferencias.setNotificarWarning(true);}
             case "error" -> {preferencias.setNotificarError(true);}
         }
+    }
+
+    public void mostrarHistorialReportes(){
+        System.out.println("\n--- HISTORIAL REPORTES ---");
+        gNotificacion.mostrarHistorial();
+    }
+
+    public void configurarPreferencias(){
+        PreferenciasNotificacion preferencias = pedirPrefrencias();
+        gNotificacion.configurarPreferencias(preferencias);
     }
 }

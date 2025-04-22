@@ -21,7 +21,7 @@ public class SistemaPrestamos {
         this.colaSolicitudes = new LinkedBlockingQueue<>();
         this.procesadorPrestamos = Executors.newFixedThreadPool(hilos);
         this.sistemaNotificaciones = sistemaNotificaciones;
-        this.sistemaVencimientos = new SistemaVencimientos(hilos);
+        this.sistemaVencimientos = new SistemaVencimientos(sistemaNotificaciones, hilos);
         iniciarProcesamiento();
     }
 
@@ -56,6 +56,7 @@ public class SistemaPrestamos {
         Usuario usuario = prestamo.getUsuario();
         usuario.reporte();
         recurso.prestar(usuario);
+        sistemaVencimientos.getColaPrestamos().add(prestamo);
         sistemaNotificaciones.notificarProcesamientoPrestamo(prestamo);
         notificarObservadores(prestamo);
     }
@@ -83,6 +84,7 @@ public class SistemaPrestamos {
     public void cerrar() {
         try {
             procesadorPrestamos.shutdown();
+            sistemaVencimientos.cerrar();
             if (!procesadorPrestamos.awaitTermination(1, TimeUnit.SECONDS)) {
                 procesadorPrestamos.shutdownNow();
 

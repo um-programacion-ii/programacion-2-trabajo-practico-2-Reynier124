@@ -96,7 +96,7 @@ public abstract class RecursoBase implements RecursoDigital, Prestable, Renovabl
 
     @Override
     public LocalDateTime getFechaDevolucion() {
-        return LocalDateTime.now().plusDays(14);
+        return LocalDateTime.now().plusDays(1);
     }
 
     @Override

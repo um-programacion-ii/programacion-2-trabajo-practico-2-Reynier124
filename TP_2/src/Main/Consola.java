@@ -191,6 +191,8 @@ public class Consola {
                 case 2 -> reporteGenerator.generarReporteRecursosMasReservados(gestorBiblioteca.conseguirRecursosReservas());
                 case 3 -> reporteGenerator.generarReporteUsuariosMasActivos(gestorBiblioteca.conseguirUsuarios());
                 case 4 -> reporteGenerator.generarEstadisticasUsoPorCategoria(gestorBiblioteca.conseguirRecursos());
+                case 5 -> gestorBiblioteca.configurarPreferencias();
+                case 6 -> gestorBiblioteca.mostrarHistorialReportes();
             }
         }while (opcion != 0);
     }
@@ -201,6 +203,8 @@ public class Consola {
         System.out.println("2. Ver recursos más reservados");
         System.out.println("3. Ver usuarios más activos");
         System.out.println("4. Ver uso por categorías");
+        System.out.println("5. Modificar preferencias");
+        System.out.println("6. Ver historial de reportes");
         System.out.println("0. Salir");
     }
 }

@@ -20,7 +20,7 @@ public class SistemaDisponibilidad implements RecursoObserver {
     }
 
     public void alertaDisponibilidad(RecursoDigital recurso) {
-        System.out.println("La reserva del recurso '" + recurso.getTitulo() + "' ahora esta disponible.");
+        notificaciones.notificarInfo("La reserva del recurso '" + recurso.getTitulo() + "' ahora esta disponible.");
     }
 
     @Override
@@ -39,4 +39,5 @@ public class SistemaDisponibilidad implements RecursoObserver {
         }
 
     }
+
 }

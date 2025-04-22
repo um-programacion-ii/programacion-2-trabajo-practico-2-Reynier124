@@ -1,6 +1,7 @@
 package Gestor;
 
 import Enum.EstadoRecurso;
+import Enum.NivelUrgencia;
 import Comparadores.ComparadorPrestamoFechaDevolucion;
 import Comparadores.ComparadorPrestamoFechaEntrega;
 import Comparadores.ComparadorRecursoTitulo;
@@ -12,12 +13,8 @@ import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Prestamo.Prestamo;
-import Recurso.Audiolibro;
-import Recurso.Libro;
-import Recurso.Revista;
 import Sistema.SistemaNotificaciones;
 import Sistema.SistemaPrestamos;
-import Sistema.SistemaRecordatorios;
 import Usuario.Usuario;
 
 import java.time.LocalDate;
@@ -30,7 +27,7 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver, Recurso
     private final GestorRecursos gestorRecursos;
     private List<Prestamo> prestamos;
     private final SistemaPrestamos sistemaPrestamos;
-    private SistemaRecordatorios sistemaRecordatorios;
+    private final SistemaNotificaciones sistemaNotificaciones;
 
     public GestorPrestamos(Scanner sc, ServicioNotificaciones notificaciones, GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, SistemaNotificaciones sistemaNotificaciones, int hilos) {
         super(sc, notificaciones);
@@ -39,7 +36,7 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver, Recurso
         prestamos = new LinkedList<Prestamo>();
         this.sistemaPrestamos = new SistemaPrestamos(sistemaNotificaciones,hilos);
         sistemaPrestamos.agregarObservador(this);
-        this.sistemaRecordatorios = null;
+        this.sistemaNotificaciones = sistemaNotificaciones;
     }
 
     public List<Prestamo> getPrestamos() {
@@ -246,6 +243,7 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver, Recurso
             for (Prestamo prestamo : prestamos){
                 if (prestamo.getRecurso().equals(recurso)){
                     prestamo.setFechaDevolucion(nuevaFecha);
+                    sistemaNotificaciones.programarRecordatorio("Faltan 2 días para que se venza el préstamo", NivelUrgencia.WARNING, LocalDateTime.now().plusDays(5));
                 }
             }
         }
