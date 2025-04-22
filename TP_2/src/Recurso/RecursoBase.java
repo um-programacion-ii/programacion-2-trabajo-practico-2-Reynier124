@@ -47,6 +47,9 @@ public abstract class RecursoBase implements RecursoDigital, Prestable, Renovabl
     }
 
     public void setEstado(EstadoRecurso estado) {
+        if (this.estado == EstadoRecurso.RESERVADO && estado == EstadoRecurso.DISPONIBLE){
+            notificarObservadores();
+        }
         this.estado = estado;
         if (estado == EstadoRecurso.DISPONIBLE) {
             notificarObservadores();

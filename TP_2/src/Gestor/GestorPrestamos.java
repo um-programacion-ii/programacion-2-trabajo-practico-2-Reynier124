@@ -61,6 +61,16 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver, Recurso
         notificaciones.notificar("Prestamo creado con exito");
     }
 
+    public void solicitarPrestamo(RecursoDigital recurso) {
+        System.out.println("\n--- CREAR PRESTAMO ---");
+        Usuario usuario = conseguirUsuario();
+        try{
+            sistemaPrestamos.solicitarPrestamo(usuario, (Prestable) recurso);
+        }catch (RecursoNoDisponibleException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     @Override
     public void buscar() {
         System.out.println("\n--- BUSCAR PRESTAMO ---");
@@ -220,7 +230,10 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver, Recurso
 
     @Override
     public void actualizar(Prestamo prestamo) {
-        prestamos.add(prestamo);
+        RecursoDigital recurso = (RecursoDigital) prestamo.getRecurso();
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO){
+            prestamos.add(prestamo);
+        }
     }
 
     @Override
