@@ -34,6 +34,7 @@ public class Consola {
                 case 2 -> gestionarRecursos();
                 case 3 -> gestionarPrestamos();
                 case 4 -> gestionarReservas();
+                case 5 ->
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opción inválida.");
             }
@@ -47,6 +48,7 @@ public class Consola {
         System.out.println("2. Sistema de recursos");
         System.out.println("3. Sistema de prestamos");
         System.out.println("4. Sistema de reservas");
+        System.out.println("5. Configurar recordatorios");
         System.out.println("0. Salir");
     }
 
@@ -174,7 +176,5 @@ public class Consola {
         System.out.println("4. Listar Reservas");
         System.out.println("0. Salir");
     }
-
-
-
+    
 }

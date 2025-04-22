@@ -5,9 +5,21 @@ public class PreferenciasNotificacion {
     private boolean notificarWarning;
     private boolean notificarError;
 
-    public PreferenciasNotificacion(boolean notificarInfo, boolean notificarWarning, boolean notificarError) {
+    public PreferenciasNotificacion() {
+        this.notificarInfo = false;
+        this.notificarWarning = false;
+        this.notificarError = false;
+    }
+
+    public void setNotificarInfo(boolean notificarInfo) {
         this.notificarInfo = notificarInfo;
+    }
+
+    public void setNotificarWarning(boolean notificarWarning) {
         this.notificarWarning = notificarWarning;
+    }
+
+    public void setNotificarError(boolean notificarError) {
         this.notificarError = notificarError;
     }
 

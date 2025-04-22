@@ -13,6 +13,7 @@ import Prestamo.Prestamo;
 import Reserva.Reservas;
 import Sistema.SistemaNotificaciones;
 import Sistema.SistemaPrestamos;
+import Sistema.SistemaRecordatorios;
 import Usuario.Usuario;
 
 import java.time.LocalDate;
@@ -20,10 +21,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GestorPrestamos extends Gestor implements PrestamoObserver {
-    private GestorUsuarios gestorUsuarios;
-    private GestorRecursos gestorRecursos;
+    private final GestorUsuarios gestorUsuarios;
+    private final GestorRecursos gestorRecursos;
     private List<Prestamo> prestamos;
-    private SistemaPrestamos sistemaPrestamos;
+    private final SistemaPrestamos sistemaPrestamos;
+    private SistemaRecordatorios sistemaRecordatorios;
 
     public GestorPrestamos(Scanner sc, ServicioNotificaciones notificaciones, GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, SistemaNotificaciones sistemaNotificaciones, int hilos) {
         super(sc, notificaciones);
@@ -32,6 +34,7 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
         prestamos = new LinkedList<Prestamo>();
         this.sistemaPrestamos = new SistemaPrestamos(sistemaNotificaciones,hilos);
         sistemaPrestamos.agregarObservador(this);
+        this.sistemaRecordatorios = null;
     }
 
     public List<Prestamo> getPrestamos() {
