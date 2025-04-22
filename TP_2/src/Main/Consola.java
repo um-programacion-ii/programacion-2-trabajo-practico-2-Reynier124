@@ -203,7 +203,4 @@ public class Consola {
         System.out.println("4. Ver uso por categorías");
         System.out.println("0. Salir");
     }
-
-
-
 }
