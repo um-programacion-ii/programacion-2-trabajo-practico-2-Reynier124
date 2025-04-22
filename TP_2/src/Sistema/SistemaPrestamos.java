@@ -54,6 +54,7 @@ public class SistemaPrestamos {
     private void procesarPrestamo(Prestamo prestamo) {
         Prestable recurso = prestamo.getRecurso();
         Usuario usuario = prestamo.getUsuario();
+        usuario.reporte();
         recurso.prestar(usuario);
         sistemaNotificaciones.notificarProcesamientoPrestamo(prestamo);
         notificarObservadores(prestamo);

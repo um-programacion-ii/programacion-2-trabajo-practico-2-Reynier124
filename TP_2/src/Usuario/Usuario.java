@@ -7,12 +7,14 @@ public class Usuario {
     private final int id;
     private String email;
     private String password;
+    private int conteoActividad;
 
     public Usuario(String nombre, String email, String password) {
         this.nombre = nombre;
         this.id = IdGenerator.generateUniqueId(Usuario.class);
         this.email = email;
         this.password = password;
+        this.conteoActividad = 0;
     }
 
     public String getNombre() {
@@ -41,6 +43,14 @@ public class Usuario {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getConteoActividad() {
+        return conteoActividad;
+    }
+
+    public void reporte(){
+        conteoActividad++;
     }
 
     @Override
