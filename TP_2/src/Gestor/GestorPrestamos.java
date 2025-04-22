@@ -7,20 +7,24 @@ import Comparadores.ComparadorRecursoTitulo;
 import Comparadores.ComparadorUsuarioNombre;
 import Excepciones.RecursoNoDisponibleException;
 import Observer.PrestamoObserver;
+import Observer.RecursoObserver;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Prestamo.Prestamo;
-import Reserva.Reservas;
+import Recurso.Audiolibro;
+import Recurso.Libro;
+import Recurso.Revista;
 import Sistema.SistemaNotificaciones;
 import Sistema.SistemaPrestamos;
 import Usuario.Usuario;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GestorPrestamos extends Gestor implements PrestamoObserver {
+public class GestorPrestamos extends Gestor implements PrestamoObserver, RecursoObserver {
     private GestorUsuarios gestorUsuarios;
     private GestorRecursos gestorRecursos;
     private List<Prestamo> prestamos;
@@ -232,10 +236,22 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
         }
     }
 
+    @Override
+    public void actualizar(RecursoDigital recurso) {
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO){
+            LocalDateTime nuevaFecha = LocalDateTime.now().plusDays(7);
+            for (Prestamo prestamo : prestamos){
+                if (prestamo.getRecurso().equals(recurso)){
+                    prestamo.setFechaDevolucion(nuevaFecha);
+                }
+            }
+        }
+    }
+
     public void listarPrestamos(List<Prestamo> prestamos) {
         System.out.println("\n--- LISTA DE RESERVAS ---");
         for (Prestamo prestamo : prestamos) {
-            System.out.println(prestamos.toString());
+            System.out.println(prestamo.toString());
         }
     }
     public void apagarSistema() {

@@ -2,9 +2,7 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
-import Interface.Prestable;
-import Interface.RecursoDigital;
-import Interface.RecursoVisitor;
+import Interface.*;
 import Observer.RecursoObserver;
 import Usuario.Usuario;
 import Util.IdGenerator;
@@ -13,12 +11,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RecursoBase implements RecursoDigital, Prestable {
+public abstract class RecursoBase implements RecursoDigital, Prestable, Renovable{
     private String titulo;
     private final int id;
     private EstadoRecurso estado;
     private Categoria categoria;
     private final List<RecursoObserver> observadores = new ArrayList<>();
+    private int conteoPrestamos;
+    private int conteoReservas;
 
 
     public RecursoBase(EstadoRecurso estado, String titulo, Categoria categoria) {
@@ -26,6 +26,8 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
         this.titulo = titulo;
         this.estado = estado;
         this.categoria = categoria;
+        this.conteoPrestamos = 0;
+        this.conteoReservas = 0;
     }
 
     public String getTitulo() {
@@ -82,7 +84,10 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
         }
     }
 
+    @Override
     public abstract void accept(RecursoVisitor visitor);
+
+
 
     @Override
     public boolean estaDisponible() {
@@ -97,11 +102,26 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
     @Override
     public void prestar(Usuario usuario) {
         setEstado(EstadoRecurso.PRESTADO);
+        conteoPrestamos++;
     }
 
     @Override
     public void reservar(){
         setEstado(EstadoRecurso.RESERVADO);
+        conteoReservas++;
+    }
+
+    public int getConteoPrestamos() {
+        return conteoPrestamos;
+    }
+
+    public int getConteoReservas() {
+        return conteoReservas;
+    }
+
+    @Override
+    public void renovar(){
+        notificarObservadores();
     }
 
     @Override

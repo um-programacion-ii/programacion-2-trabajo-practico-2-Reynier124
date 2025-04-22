@@ -97,6 +97,8 @@ public class SistemaNotificaciones implements RecursoObserver {
         if (recurso.getEstado() == EstadoRecurso.DISPONIBLE){
             servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ahora esta disponible.");
         }
-
+        } else if (recurso.getEstado() == EstadoRecurso.PRESTADO) {
+            servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ha sido procesado.");
+        }
     }
 }

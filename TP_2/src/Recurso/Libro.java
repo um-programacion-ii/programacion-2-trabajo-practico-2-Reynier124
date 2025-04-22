@@ -4,7 +4,7 @@ import Enum.EstadoRecurso;
 import Enum.Categoria;
 import Interface.RecursoVisitor;
 
-public class Libro extends RecursoBase {
+public class Libro extends RecursoBase{
     private int cant_paginas;
 
     public Libro(EstadoRecurso estado, String titulo, Categoria categoria, int cant_paginas) {
@@ -24,6 +24,8 @@ public class Libro extends RecursoBase {
     public void accept(RecursoVisitor visitor) {
         visitor.visit(this);
     }
+
+
 
     @Override
     public String toString() {
