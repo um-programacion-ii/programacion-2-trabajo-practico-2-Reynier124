@@ -2,9 +2,7 @@ package Recurso;
 
 import Enum.EstadoRecurso;
 import Enum.Categoria;
-import Interface.Prestable;
-import Interface.RecursoDigital;
-import Interface.RecursoVisitor;
+import Interface.*;
 import Observer.RecursoObserver;
 import Usuario.Usuario;
 import Util.IdGenerator;
@@ -13,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RecursoBase implements RecursoDigital, Prestable {
+public abstract class RecursoBase implements RecursoDigital, Prestable, Renovable{
     private String titulo;
     private final int id;
     private EstadoRecurso estado;
@@ -83,7 +81,10 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
         }
     }
 
+    @Override
     public abstract void accept(RecursoVisitor visitor);
+
+
 
     @Override
     public boolean estaDisponible() {
@@ -113,6 +114,11 @@ public abstract class RecursoBase implements RecursoDigital, Prestable {
 
     public int getConteoReservas() {
         return conteoReservas;
+    }
+
+    @Override
+    public void renovar(){
+        notificarObservadores();
     }
 
     @Override

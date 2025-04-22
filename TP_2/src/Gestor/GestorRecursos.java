@@ -5,6 +5,7 @@ import Enum.EstadoRecurso;
 import Excepciones.RecursoNoDisponibleException;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
+import Observer.RecursoObserver;
 import Recurso.*;
 import Comparadores.ComparadorRecursoTitulo;
 import Sistema.SistemaNotificaciones;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
 
 public class GestorRecursos extends Gestor {
     private List<RecursoDigital> recursos;
-    private final SistemaNotificaciones sistemaNotificaciones;
+    private List<RecursoObserver> observadores;
 
-    public GestorRecursos(Scanner sc, ServicioNotificaciones notificaciones, SistemaNotificaciones sistemaNotificaciones) {
+    public GestorRecursos(Scanner sc, ServicioNotificaciones notificaciones, List<RecursoObserver> observadores) {
         super(sc, notificaciones);
         recursos = new ArrayList<>();
-        this.sistemaNotificaciones = sistemaNotificaciones;
+        this.observadores = observadores;
     }
 
     public List<RecursoDigital> getRecursos() {
@@ -32,6 +33,10 @@ public class GestorRecursos extends Gestor {
 
     public void setRecursos(List<RecursoDigital> recursos) {
         this.recursos = recursos;
+    }
+
+    public List<RecursoObserver> getObservadores() {
+        return observadores;
     }
 
     @Override
@@ -72,19 +77,31 @@ public class GestorRecursos extends Gestor {
             case 1 -> {
                 Categoria categoria = Categoria.Libro;
                 int cant_paginas = ip.leerEntero("Cantidad de paginas: ");
-                recursos.add(new Libro(estado, titulo,categoria, cant_paginas));
+                RecursoDigital recurso = new Libro(estado, titulo,categoria, cant_paginas);
+                for (RecursoObserver observador : observadores) {
+                    recurso.agregarObservador(observador);
+                }
+                recursos.add(recurso);
                 notificaciones.notificar("El libro ha sido creado con éxito");
             }
             case 2 -> {
                 Categoria categoria = Categoria.Revista;
                 String periocidad = ip.leerTexto("Periocidad: ");
-                recursos.add(new Revista(estado, titulo,categoria, periocidad));
+                RecursoDigital recurso = new Revista(estado, titulo,categoria, periocidad);
+                for (RecursoObserver observador : observadores) {
+                    recurso.agregarObservador(observador);
+                }
+                recursos.add(recurso);
                 notificaciones.notificar("La revista ha sido creada con éxito");
             }
             case 3 -> {
                 Categoria categoria = Categoria.Audiolibro;
                 String duracion = ip.leerTexto("Duracion: ");
-                recursos.add(new Audiolibro(estado, titulo, categoria, duracion));
+                RecursoDigital recurso = new Audiolibro(estado, titulo,categoria, duracion);
+                for (RecursoObserver observador : observadores) {
+                    recurso.agregarObservador(observador);
+                }
+                recursos.add(recurso);
                 notificaciones.notificar("El audiolibro ha sido creado con éxito");
             }
         }
