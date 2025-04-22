@@ -8,6 +8,7 @@ import Interface.RecursoDigital;
 import Gestor.GestorRecursos;
 import Gestor.GestorUsuarios;
 import Util.Input;
+import Util.ReporteGenerator;
 
 import java.util.Scanner;
 
@@ -16,12 +17,14 @@ public class Consola {
     private final ServicioNotificaciones notificaciones;
     private Input ip;
     private final GestorBiblioteca gestorBiblioteca;
+    private final ReporteGenerator reporteGenerator;
 
     public Consola(ServicioNotificaciones servicio, int hilos) {
         scanner = new Scanner(System.in);
         this.notificaciones = servicio;
         ip = new Input(scanner);
         gestorBiblioteca = new GestorBiblioteca(scanner, notificaciones, hilos);
+        reporteGenerator = new ReporteGenerator();
     }
 
     public void iniciar() {
@@ -34,7 +37,7 @@ public class Consola {
                 case 2 -> gestionarRecursos();
                 case 3 -> gestionarPrestamos();
                 case 4 -> gestionarReservas();
-                case 5 ->
+                case 5 -> gestionarReportes();
                 case 0 -> System.out.println("Saliendo...");
                 default -> System.out.println("Opción inválida.");
             }
@@ -48,7 +51,7 @@ public class Consola {
         System.out.println("2. Sistema de recursos");
         System.out.println("3. Sistema de prestamos");
         System.out.println("4. Sistema de reservas");
-        System.out.println("5. Configurar recordatorios");
+        System.out.println("5. Sistema de reportes");
         System.out.println("0. Salir");
     }
 
@@ -176,5 +179,28 @@ public class Consola {
         System.out.println("4. Listar Reservas");
         System.out.println("0. Salir");
     }
-    
+
+    private void gestionarReportes(){
+        int opcion;
+        do {
+            mostrarMenuReportes();
+            opcion = ip.leerEntero("Seleccione una opcion: ");
+            switch (opcion) {
+                case 0 -> System.out.println("Saliendo...");
+                case 1 -> reporteGenerator.generarReporteRecursosMasPrestados(gestorBiblioteca.conseguirRecursosPrestamos());
+                case 2 -> reporteGenerator.generarReporteRecursosMasReservados(gestorBiblioteca.conseguirRecursosReservas());
+                case 3 -> reporteGenerator.generarReporteUsuariosMasActivos(gestorBiblioteca.conseguirUsuarios());
+                case 4 -> reporteGenerator.generarEstadisticasUsoPorCategoria(gestorBiblioteca.conseguirRecursos());
+            }
+        }while (opcion != 0);
+    }
+
+    private void mostrarMenuReportes(){
+        System.out.println("\n--- MENÚ REPORTES ---");
+        System.out.println("1. Ver recursos más prestados");
+        System.out.println("2. Ver recursos más reservados");
+        System.out.println("3. Ver usuarios más activos");
+        System.out.println("4. Ver uso por categorías");
+        System.out.println("0. Salir");
+    }
 }

@@ -55,6 +55,8 @@ public class SistemaReservas {
 
     private void procesarReserva(Reservas reserva) {
         Prestable recurso = reserva.getRecurso();
+        Usuario usuario = reserva.getUsuario();
+        usuario.reporte();
         recurso.reservar();
         sistemaNotificaciones.notificarProcesamientoReserva(reserva);
         notificarObservadores(reserva);

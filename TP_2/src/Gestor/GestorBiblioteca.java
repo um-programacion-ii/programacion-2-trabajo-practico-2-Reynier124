@@ -5,9 +5,18 @@ import Excepciones.UsuarioNoEncontradoException;
 import Interface.ServicioNotificaciones;
 import Recordatorio.PreferenciasNotificacion;
 import Sistema.SistemaNotificaciones;
-import Sistema.SistemaRecordatorios;
+import Sistema.SistemaDisponibilidad;
+import Observer.RecursoObserver;
+import Prestamo.Prestamo;
+import Recurso.RecursoBase;
+import Reserva.Reservas;
+import Sistema.SistemaNotificaciones;
+import Usuario.Usuario;
 import Util.Input;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class GestorBiblioteca {
@@ -16,15 +25,21 @@ public class GestorBiblioteca {
     private GestorReservas gReserva;
     private SistemaNotificaciones gNotificacion;
     private GestorPrestamos gPrestamo;
+    private SistemaDisponibilidad gDisponibilidad;
     private Input input;
 
     public GestorBiblioteca(Scanner scanner, ServicioNotificaciones servicioNotificacion,int hilos) {
+        List<RecursoObserver> observers = new ArrayList<>();
         this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, hilos);
+        observers.add(gNotificacion);
         this.gUsuario = new GestorUsuarios(scanner, servicioNotificacion, gNotificacion);
-        this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, gNotificacion);
+        this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, observers);
         this.gReserva = new GestorReservas(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
         this.gPrestamo = new GestorPrestamos(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
         this.input = new Input(scanner);
+        this.gDisponibilidad = new SistemaDisponibilidad(gNotificacion, gPrestamo);
+        gRecurso.getObservadores().add(gPrestamo);
+
     }
 
     public void crear(String opcion) throws RecursoNoDisponibleException {
@@ -61,6 +76,41 @@ public class GestorBiblioteca {
             case "Reserva" -> {gReserva.listarReservas(gReserva.getReservas());}
             case "Prestamo" -> {gPrestamo.listarPrestamos(gPrestamo.getPrestamos());}
         }
+    }
+
+    public List<RecursoBase> conseguirRecursosPrestamos(){
+       List<Prestamo> prestamos = gPrestamo.getPrestamos();
+       List<RecursoBase> recursos = new ArrayList<>();
+       for (Prestamo prestamo : prestamos) {
+           recursos.add((RecursoBase) prestamo.getRecurso());
+       }
+       return recursos;
+    }
+
+    public List<RecursoBase> conseguirRecursosReservas(){
+        List<Reservas> reservas = gReserva.getReservas();
+        List<RecursoBase> recursos = new ArrayList<>();
+        for (Reservas reserva : reservas) {
+            recursos.add((RecursoBase) reserva.getRecurso());
+        }
+        return recursos;
+    }
+
+    public List<Usuario> conseguirUsuarios(){
+        Map<String, Usuario> usuarios = gUsuario.getUsuarios();
+        List<Usuario> usuarioList = new ArrayList<>();
+        for (Usuario usuario : usuarios.values()) {
+            usuarioList.add(usuario);
+        }
+        return usuarioList;
+    }
+
+    public List<RecursoBase> conseguirRecursos(){
+        List<RecursoBase> lista1 = conseguirRecursosPrestamos();
+        List<RecursoBase> lista2 = conseguirRecursosReservas();
+        List<RecursoBase> listaRecursos = new ArrayList<>(lista1);
+        listaRecursos.addAll(lista2);
+        return listaRecursos;
     }
 
     public void terminar(){

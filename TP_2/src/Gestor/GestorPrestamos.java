@@ -1,26 +1,31 @@
 package Gestor;
 
+import Enum.EstadoRecurso;
 import Comparadores.ComparadorPrestamoFechaDevolucion;
 import Comparadores.ComparadorPrestamoFechaEntrega;
 import Comparadores.ComparadorRecursoTitulo;
 import Comparadores.ComparadorUsuarioNombre;
 import Excepciones.RecursoNoDisponibleException;
 import Observer.PrestamoObserver;
+import Observer.RecursoObserver;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Prestamo.Prestamo;
-import Reserva.Reservas;
+import Recurso.Audiolibro;
+import Recurso.Libro;
+import Recurso.Revista;
 import Sistema.SistemaNotificaciones;
 import Sistema.SistemaPrestamos;
 import Sistema.SistemaRecordatorios;
 import Usuario.Usuario;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GestorPrestamos extends Gestor implements PrestamoObserver {
+public class GestorPrestamos extends Gestor implements PrestamoObserver, RecursoObserver {
     private final GestorUsuarios gestorUsuarios;
     private final GestorRecursos gestorRecursos;
     private List<Prestamo> prestamos;
@@ -57,6 +62,16 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
         }
 
         notificaciones.notificar("Prestamo creado con exito");
+    }
+
+    public void solicitarPrestamo(RecursoDigital recurso) {
+        System.out.println("\n--- CREAR PRESTAMO ---");
+        Usuario usuario = conseguirUsuario();
+        try{
+            sistemaPrestamos.solicitarPrestamo(usuario, (Prestable) recurso);
+        }catch (RecursoNoDisponibleException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
@@ -218,13 +233,28 @@ public class GestorPrestamos extends Gestor implements PrestamoObserver {
 
     @Override
     public void actualizar(Prestamo prestamo) {
-        prestamos.add(prestamo);
+        RecursoDigital recurso = (RecursoDigital) prestamo.getRecurso();
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO){
+            prestamos.add(prestamo);
+        }
+    }
+
+    @Override
+    public void actualizar(RecursoDigital recurso) {
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO){
+            LocalDateTime nuevaFecha = LocalDateTime.now().plusDays(7);
+            for (Prestamo prestamo : prestamos){
+                if (prestamo.getRecurso().equals(recurso)){
+                    prestamo.setFechaDevolucion(nuevaFecha);
+                }
+            }
+        }
     }
 
     public void listarPrestamos(List<Prestamo> prestamos) {
         System.out.println("\n--- LISTA DE RESERVAS ---");
         for (Prestamo prestamo : prestamos) {
-            System.out.println(prestamos.toString());
+            System.out.println(prestamo.toString());
         }
     }
     public void apagarSistema() {

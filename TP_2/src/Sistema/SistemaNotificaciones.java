@@ -1,5 +1,6 @@
 package Sistema;
 
+import Enum.EstadoRecurso;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
@@ -61,6 +62,7 @@ public class SistemaNotificaciones implements RecursoObserver {
         });
     }
 
+
     public void notificarCreacionUsuario(Usuario usuario) {
         executorService.submit(() -> {
             String mensaje = "Usuario creado: " + usuario.getNombre();
@@ -92,6 +94,11 @@ public class SistemaNotificaciones implements RecursoObserver {
 
     @Override
     public void actualizar(RecursoDigital recurso) {
-        servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ahora esta disponible.");
+        if (recurso.getEstado() == EstadoRecurso.DISPONIBLE){
+            servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ahora esta disponible.");
+        }
+        } else if (recurso.getEstado() == EstadoRecurso.PRESTADO) {
+            servicioNotificaciones.notificar("El recurso " + recurso.getTitulo() + " ha sido procesado.");
+        }
     }
 }
