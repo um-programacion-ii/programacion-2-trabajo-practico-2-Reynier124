@@ -40,7 +40,7 @@ public class RecursoSearchVisitor implements RecursoVisitor {
         match = (titulo == null || titulo.isEmpty() || revista.getTitulo().equalsIgnoreCase(titulo)) &&
                 (categoria == null || categoria.isEmpty() || revista.getCategoria().toString().equalsIgnoreCase(categoria)) &&
                 (estado == null || revista.getEstado().equals(estado)) &&
-                (periodicidad == null || periodicidad.isEmpty() || revista.getPeriodicidad().equalsIgnoreCase(periodicidad));
+                (periodicidad == null || periodicidad.isEmpty() || revista.getPeriodicidad().toString().equalsIgnoreCase(periodicidad));
     }
 
     @Override

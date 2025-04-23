@@ -173,9 +173,7 @@ public class SistemaNotificaciones implements RecursoObserver {
 
     @Override
     public void actualizar(RecursoDigital recurso) {
-        if (recurso.getEstado() == EstadoRecurso.DISPONIBLE){
-            notificarInfo("El recurso " + recurso.getTitulo() + " ahora esta disponible.");
-        } else if (recurso.getEstado() == EstadoRecurso.PRESTADO) {
+        if (recurso.getEstado() == EstadoRecurso.PRESTADO) {
             notificarWarning("El recurso " + recurso.getTitulo() + " ha sido procesado.");
         }
     }

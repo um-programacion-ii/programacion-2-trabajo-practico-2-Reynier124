@@ -41,14 +41,16 @@ public class SistemaPrestamos {
         }
     }
 
-    public void solicitarPrestamo(Usuario usuario, Prestable recurso) throws RecursoNoDisponibleException {
-        if (recurso.estaDisponible()){
+    public void solicitarPrestamo(Usuario usuario, Prestable recurso)  {
+        if (recurso.estaDisponibleReservar()){
             Prestamo prestamo = new Prestamo(usuario, recurso, recurso.getFechaDevolucion());
             colaSolicitudes.add(prestamo);
             sistemaNotificaciones.notificarDisponibilidadPrestamo(prestamo);
         }else {
-            throw new RecursoNoDisponibleException("El recurso no está disponible para préstamo.");
+            System.out.println("El recurso esta no disponible");
         }
+
+
     }
 
     private void procesarPrestamo(Prestamo prestamo) {

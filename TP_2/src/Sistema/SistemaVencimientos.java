@@ -1,5 +1,6 @@
 package Sistema;
 
+import Enum.NivelUrgencia;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.Renovable;
@@ -33,9 +34,7 @@ public class SistemaVencimientos {
                 while (true) {
                     try{
                         Prestamo prestamo = colaPrestamos.take();
-                        System.out.println("1");
                         int vencimiento = comprobacionFechaDevolucion(prestamo.getFechaDevolucion());
-                        System.out.println("2: " + vencimiento);
                         switch (vencimiento){
                             case 2 -> alertaVencimientos(prestamo);
                             case 3 -> avisoVencimiento(prestamo);
@@ -89,6 +88,7 @@ public class SistemaVencimientos {
             switch (decision){
                 case "s" -> {
                     ((Renovable) recurso).renovar();
+                    colaPrestamos.add(prestamo);
                 }
                 case "n" -> {
                     System.out.println("Entonces por favor entregar el recurso a la biblioteca en el transcurso de 24 horas");
@@ -98,17 +98,22 @@ public class SistemaVencimientos {
         }while (!decision.equals("s") && !decision.equals("n"));
     }
 
-    public synchronized void avisoVencimiento(Prestamo prestamo){
-        if (notificaciones.getPreferencia().isNotificarError()){
-            Prestable recurso = prestamo.getRecurso();
-            Usuario usuario = prestamo.getUsuario();
-            System.out.println("****************************************");
-            System.out.println("ALERTA: Ha vencido");
-            System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-            System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-            System.out.println("Usuario: " + usuario.getNombre());
-            System.out.println("****************************************");
+    public void avisoVencimiento(Prestamo prestamo){
+        synchronized (System.out){
+            if (notificaciones.getPreferencia().isNotificarError()){
+                Prestable recurso = prestamo.getRecurso();
+                Usuario usuario = prestamo.getUsuario();
+                System.out.println("****************************************");
+                System.out.println("ALERTA: Ha vencido");
+                System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+                System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+                System.out.println("Usuario: " + usuario.getNombre());
+                System.out.println("****************************************");
+                notificaciones.guardarRecordatorio("Ha vencido el recurso "+ ((RecursoDigital) recurso).getTitulo(), NivelUrgencia.ERROR);
+            }
+
         }
+
 
     }
 

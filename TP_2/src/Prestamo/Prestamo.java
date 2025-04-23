@@ -10,12 +10,14 @@ public class Prestamo {
     private final Prestable recurso;
     private LocalDateTime fechaEntrega;
     private LocalDateTime fechaDevolucion;
+    private boolean devuelto;
 
     public Prestamo(Usuario usuario, Prestable recurso, LocalDateTime fechaDevolucion) {
         this.usuario = usuario;
         this.recurso = recurso;
         this.fechaEntrega = LocalDateTime.now();
         this.fechaDevolucion = fechaDevolucion;
+        this.devuelto = false;
     }
 
     public Usuario getUsuario() {
@@ -42,6 +44,14 @@ public class Prestamo {
         this.fechaDevolucion = fechaDevolucion;
     }
 
+    public boolean isDevuelto() {
+        return devuelto;
+    }
+
+    public void setDevuelto(boolean devuelto) {
+        this.devuelto = devuelto;
+    }
+
     @Override
     public String toString() {
         return "Prestamo{" +
@@ -49,6 +59,7 @@ public class Prestamo {
                 ", recurso=" + recurso +
                 ", fechaEntrega=" + fechaEntrega +
                 ", fechaDevolucion=" + fechaDevolucion +
+                ", devuelto=" + devuelto +
                 '}';
     }
 }

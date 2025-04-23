@@ -17,12 +17,18 @@ public class SistemaReservas {
     private final ExecutorService procesadorReservas;
     private final List<ReservaObserver> observadores = new ArrayList<>();
     private final SistemaNotificaciones sistemaNotificaciones;
+    private final SistemaDisponibilidad sistemaDisponibilidad;
 
-    public SistemaReservas(SistemaNotificaciones sistemaNotificaciones,int hilos) {
+    public SistemaReservas(SistemaNotificaciones sistemaNotificaciones, SistemaDisponibilidad sistemaDisponibilidad ,int hilos) {
         this.colaReservas = new PriorityBlockingQueue<>();
         this.procesadorReservas = Executors.newFixedThreadPool(hilos);
         this.sistemaNotificaciones = sistemaNotificaciones;
+        this.sistemaDisponibilidad = sistemaDisponibilidad;
         iniciarProcesamiento();
+    }
+
+    public PriorityBlockingQueue<Reservas> getColaReservas() {
+        return colaReservas;
     }
 
     private void iniciarProcesamiento() {
@@ -43,10 +49,12 @@ public class SistemaReservas {
 
 
     public synchronized void agregarReserva(Usuario usuario, Prestable recurso, int prioridad) throws RecursoNoDisponibleException {
-        if (recurso.estaDisponible()){
+        if (recurso.estaDisponibleReservar()){
             Reservas reserva = new Reservas(usuario, recurso, prioridad);
-            colaReservas.put(reserva);
-            sistemaNotificaciones.notificarDisponibilidadReserva(reserva);
+            usuario.reporte();
+            recurso.reservar();
+            sistemaNotificaciones.notificarProcesamientoReserva(reserva);
+            notificarObservadores(reserva);
         }else {
             throw new RecursoNoDisponibleException("El recurso no está disponible para reservar.");
         }
@@ -54,13 +62,10 @@ public class SistemaReservas {
     }
 
     private void procesarReserva(Reservas reserva) {
-        Prestable recurso = reserva.getRecurso();
-        Usuario usuario = reserva.getUsuario();
-        usuario.reporte();
-        recurso.reservar();
-        sistemaNotificaciones.notificarProcesamientoReserva(reserva);
-        notificarObservadores(reserva);
+        sistemaDisponibilidad.realizarPrestamo(reserva);
+
     }
+
 
     public void agregarObservador(ReservaObserver o) {
         synchronized (observadores) {

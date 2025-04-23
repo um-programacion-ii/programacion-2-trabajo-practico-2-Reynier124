@@ -24,7 +24,6 @@ public class GestorBiblioteca {
     private final GestorReservas gReserva;
     private final SistemaNotificaciones gNotificacion;
     private final GestorPrestamos gPrestamo;
-    private SistemaDisponibilidad gDisponibilidad;
     private final Input input;
 
     public GestorBiblioteca(Scanner scanner, ServicioNotificaciones servicioNotificacion,int hilos) {
@@ -32,13 +31,13 @@ public class GestorBiblioteca {
         this.input = new Input(scanner);
         this.gNotificacion = new SistemaNotificaciones(servicioNotificacion, pedirPrefrencias(),hilos);
         observers.add(gNotificacion);
-        this.gUsuario = new GestorUsuarios(scanner, servicioNotificacion, gNotificacion);
-        this.gRecurso = new GestorRecursos(scanner, servicioNotificacion, observers);
-        this.gReserva = new GestorReservas(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
-        this.gPrestamo = new GestorPrestamos(scanner, servicioNotificacion, gUsuario, gRecurso, gNotificacion, hilos);
+        this.gUsuario = new GestorUsuarios(gNotificacion);
+        this.gRecurso = new GestorRecursos(gNotificacion, observers);
+        this.gPrestamo = new GestorPrestamos(gUsuario, gRecurso, gNotificacion, hilos);
+        this.gReserva = new GestorReservas(gUsuario, gRecurso, gNotificacion, gPrestamo, hilos);
 
-        this.gDisponibilidad = new SistemaDisponibilidad(gNotificacion, gPrestamo);
         gRecurso.getObservadores().add(gPrestamo);
+        gRecurso.getObservadores().add(gReserva.getSistemaDisponibilidad());
 
     }
 
@@ -162,5 +161,13 @@ public class GestorBiblioteca {
     public void configurarPreferencias(){
         PreferenciasNotificacion preferencias = pedirPrefrencias();
         gNotificacion.configurarPreferencias(preferencias);
+    }
+
+    public void devolverPrestamo(){
+        gPrestamo.devolverPrestamo();
+    }
+
+    public void cambiarEstado(){
+        gRecurso.cambiarEstado();
     }
 }
