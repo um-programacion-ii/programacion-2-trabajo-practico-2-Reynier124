@@ -1,3 +1,4 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/tc38IXJF)
 # 📚 Trabajo Práctico: Sistema de Gestión de Biblioteca Digital (Java 21+)
 
 ## 📌 Objetivo General
@@ -5,114 +6,160 @@
 Desarrollar un sistema de gestión de biblioteca digital que implemente los cinco principios SOLID, programación orientada a objetos, y conceptos avanzados de Java. El sistema deberá manejar diferentes tipos de recursos digitales, préstamos, reservas, y notificaciones en tiempo real.
 
 ## 👨‍🎓 Información del Alumno
-- **Nombre y Apellido**: [Nombre y Apellido del Alumno]
+- **Nombre y Apellido**: Reynier López
 
 ## 📋 Requisitos Adicionales
 
-### Documentación del Sistema
-Como parte del trabajo práctico, deberás incluir en este README una guía de uso que explique:
+## Documentación del alumno
 
-1. **Cómo funciona el sistema**:
-   - Descripción general de la arquitectura
-   - Explicación de los componentes principales
-   - Flujo de trabajo del sistema
+### Detalles del proyecto
 
-2. **Cómo ponerlo en funcionamiento**:
-   - Deberás incluir las instrucciones detalladas de puesta en marcha
-   - Explicar los requisitos previos necesarios
-   - Describir el proceso de compilación
-   - Detallar cómo ejecutar la aplicación
+1. **¿Cómo funciona el sistema?**
+        Basicamente se utiliza unos menus para interacturar con el usuario, estos
+        mismos son unos scanners y al recibir una respuesta se activa una 
+        funcionalidad del sistema a través de un switch case.
+        Se utiliza la clase gestorBibloteca como intermediario entre los distintos
+        gestores de clases de persistencia y las notificaciones, alertas y creación
+        de prestamos y alertas se utiliza concurrencia.
 
-3. **Cómo probar cada aspecto desarrollado**:
-   - Deberás proporcionar ejemplos de uso para cada funcionalidad implementada
-   - Incluir casos de prueba que demuestren el funcionamiento del sistema
-   - Describir flujos de trabajo completos que muestren la interacción entre diferentes componentes
+2. **¿Cómo ponerlo en funcionamiento?**
+    Esta es la guía paso a paso:
+    - Posicionarse en una carpeta para poner el proyecto
+    - Abir la terminal o git bash si estas en windows
+    - Copiar los siguientes comandos: 
+    - git clone git@github.com:um-programacion-ii/programacion-2-trabajo-practico-2-Reynier124.git
+    - cd cd programacion-2-trabajo-practico-2-Reynier124/
+    - Abir en esa posición tu IDE o editor de codigo predilecto
+    - Compilar si tu IDE no lo hace automáticamente
+    - Ir en TP_2/src/main/main.java e iniciar la ejecución
 
-La guía debe ser clara, concisa y permitir a cualquier usuario entender y probar el sistema. Se valorará especialmente:
-- La claridad de las instrucciones
-- La completitud de la documentación
-- La organización de la información
-- La inclusión de ejemplos prácticos
+### Instrucciones para probar los aspectos desarrollados
 
-### Prueba de Funcionalidades
+### 0. Configuración
+1. **Al iniciar el programa**:
+    Una vez empiezas el programa te va a pedir que tipo de servicio
+    de notificaciones vas a querer, esto es obligatorio y no cambiara ninguna prueba cuál vayas a
+    elegir. Además, te va a preguntar las preferencias en las notificaciones, recomendaría poner
+    todas que sí o quitar info que puede ser algo molesta.
+2. **Durante la ejecución**:
+    Puedes modificar en todo momento las preferencias de las notificaciones
+    en el menu de reportes
 
-#### 1. Gestión de Recursos
-- **Agregar Libro**: 
-  - Proceso para agregar un nuevo libro al sistema
-  - Verificación de que el libro se agregó correctamente
-  - Validación de los datos ingresados
+### 1. Gestión de Recursos
+1. **Creación**: Para crear un recurso tendrías que ir al menu de recursos y elegir la primera 
+    opción que sería "Crear Recurso". Ahí te va a dar elegir entre 3 categorías: libro, revista
+    y audiolibro, luego va a pedir el título (No puede haber titular iguales) y un parametro extra
+    dependiendo de la categoria. Una vez completados todos los datos se habrá generado el recurso.
+2. **Buscar**: Para buscar un recurso tendrías que ir al menu de recursos y elegir la segunda
+    opción, en esta te va a pedir todos los parametros necesarios (Todos son opcionales) y a partir
+    de los parametros dados hará un filter a la lista y te devolverá los resultados.
+3. **Listar Recursos**: Es tan simple como elegir la cuarta opción del menu de recursos. Además,
+    se puede usar la tercera opción para ordenar internamente la lista de recursos en orden alfabetico
+    ascendente o descendente. Esto también servirá para validar que buscar y crear funcionan correctamente
 
-- **Buscar Recurso**:
-  - Proceso de búsqueda de recursos
-  - Verificación de resultados de búsqueda
-  - Manejo de casos donde no se encuentran resultados
+### 2. Gestión de Usuarios
+1. **Creación**: Ir al menu de usuarios, elegir la primera opción para crear un usuario y va a
+    empezar a pedir los siguientes datos: nombre (Tiene que ser único), email (Tiene que ser un
+    email valido) y contraseña (Mínimo 4 caracteres). Una vez completado los datos se creará el
+    usuario y llegará una notificación para confirmar que se creó correctamente.
+2. **Buscar**: Ir al menu de usuarios, elegir la segunda opción y te empieza a pedir los
+    parametros de búsqueda, todos son opcionales y sirven para luego hacer un filter a la lista.
+    Una vez pasado todos los parametros te devolverá en pantalla los resultados
 
-- **Listar Recursos**:
-  - Visualización de todos los recursos
-  - Filtrado por diferentes criterios
-  - Ordenamiento de resultados
+### 3. Préstamos
+1. **Realizar Préstamo**: Primero es recomendable revisar la lista de recursos y sus estados y,
+    a partir de ahí, elegir un recurso para hacer un préstamo. Una vez que tengas decidido el
+    recurso vuelves al menu principal y luego elegis el menu de préstamos. Para crear el préstamo
+    tienes que elegir la primera opción del menu y te va a pedir el nombre o id del usuario que
+    quiere hacer el préstamo (Tiene que ser exacto) y luego te pide el título o id del recurso
+   (También es exacto) y envía la petición a una cola para luego ser procesada. Si tienes las
+    preferencias adecuadas te va a avisar que el préstamo se creó y se procesó correctamente.
+2. **Devolver Recurso**: En el menu de préstamos eliges la quinta opción, te va a pedir los mismos
+    datos que hiciste para crear el préstamo y va a hacer una comprobación para ver si no está devuelto.
+    Si no está devuelto, se realizará la devolución. Se puede confirmar a través del listado de
+    recursos o de préstamos.
 
-#### 2. Gestión de Usuarios
-- **Registrar Usuario**:
-  - Proceso de registro de nuevos usuarios
-  - Validación de datos del usuario
-  - Verificación del registro exitoso
+### 4. Reservas
+1. **Realizar Reserva**: Los pasos son similares que los de préstamo con la diferencia que es en
+    el menu de reservas y que te va a pedir la prioridad con la que se trate la reserva (Valor 
+    máximo es 4). Y si tienes la preferencia de info, te avisará cuándo el recurso esté disponible
+    y solo es posible tener una reserva por usuario.
 
-- **Buscar Usuario**:
-  - Proceso de búsqueda de usuarios
-  - Visualización de información del usuario
-  - Manejo de usuarios no encontrados
+### 5. Reportes
+1. **Ver Reportes**: Si vas al menu de reportes tienes distintas opciones como ver qué usuario es más
+    activo, un historial de las notificaciones que fueron apareciendo, los recursos más reservados o
+    prestados, ver los usos de las categorias y modificar tus preferencias en las notificaciones.
 
-#### 3. Préstamos
-- **Realizar Préstamo**:
-  - Proceso completo de préstamo
-  - Verificación de disponibilidad
-  - Actualización de estados
+### 6. Alertas
+1. **Verificar Alertas**: El codigo está programado para que cuándo crees un prestamo te salga inmediatamente
+    una alerta para ver si quieres renovar el préstamo, si renuevas el prestamo te debería salir otra alerta
+    indicando que se te paso la fecha de devolución. Obviamente no es el funcionamiento normal del programa,
+    esto es solamente para probar las alertas.
 
-- **Devolver Recurso**:
-  - Proceso de devolución
-  - Actualización de estados
-  - Liberación del recurso
-
-#### 4. Reservas
-- **Realizar Reserva**:
-  - Proceso de reserva de recursos
-  - Gestión de cola de reservas
-  - Notificación de disponibilidad
-
-#### 5. Reportes
-- **Ver Reportes**:
-  - Generación de diferentes tipos de reportes
-  - Visualización de estadísticas
-  - Exportación de datos
-
-#### 6. Alertas
-- **Verificar Alertas**:
-  - Sistema de notificaciones
-  - Diferentes tipos de alertas
-  - Gestión de recordatorios
-
-### Ejemplos de Prueba
-1. **Flujo Completo de Préstamo**:
-   - Registrar un usuario
-   - Agregar un libro
-   - Realizar un préstamo
-   - Verificar el estado del recurso
-   - Devolver el recurso
-   - Verificar la actualización del estado
+## Ejemplos de pruebas
+1. **Flujo completo de préstamo**:
+    - Elegir sistema de notificación
+    - Completar sus preferencias de notificación (En este caso todas en No)
+    - Elegir la primera opción (Menu de usuarios)
+    - Elegir la primera opción (Crear usuario)
+    - Completar nombre
+    - Completar email (Tiene que ser un string con "@")
+    - Completar contraseña (Mínimo 4 caracteres)
+    - Elegir la última opción (Volver)
+    - Elegir segunda opción (Menu de recursos)
+    - Elegir primera opción (Crear recurso)
+    - Elegir categoria (En este caso, libro)
+    - Completar titulo
+    - Completar cantidad de páginas
+    - Elegir ultima opción (Volver)
+    - Elegir tercera opción (Menu de préstamos)
+    - Elegir primera opción (Crear préstamo)
+    - Completar con el nombre de usuario recién creado
+    - Completar con el título del recurso recién creado
+    - Elegir última opción
+    - Elegir segunda opción (Menu de recursos)
+    - Elegir cuarta opción (Listar recursos)
+    - Verificar estado de recurso (Debería estar Prestado)
+    - Elegir última opción (Volver)
+    - Elegir tercera opción (Menu de préstamos)
+    - Elegir quinta opción (Devolver préstamo)
+    - Completar con el nombre de usuario recién creado
+    - Completar con el título del recurso recién creado
+    - Elegir cuarta opción (Listar Préstamos)
+    - Verificar que el prestamo diga devuelto
+    - Elegir última opción (Volver)
+    - Elegir segunda opción (Menu de recursos)
+    - Elegir cuarta opción (Listar recursos)
+    - Verificar estado de recurso (Debería estar Disponible)
 
 2. **Sistema de Reservas**:
-   - Registrar dos usuarios
-   - Agregar un libro
-   - Realizar una reserva con cada usuario
-   - Verificar la cola de reservas
-   - Procesar las reservas
+    - Elegir sistema de notificación
+    - Completar sus preferencias de notificación (Todas en sí)
+    - Elegir la primera opción (Menu de usuarios)
+    - Elegir la primera opción (Crear usuario)
+    - Completar nombre
+    - Completar email (Tiene que ser un string con "@")
+    - Completar contraseña (Mínimo 4 caracteres)
+    - Repetir procedimiento para crear otro usuario
+    - Elegir la última opción (Volver)
+    - Elegir segunda opción (Menu de recursos)
+    - Elegir primera opción (Crear recurso)
+    - Elegir categoria (En este caso, libro)
+    - Completar titulo
+    - Completar cantidad de páginas
+    - Elegir ultima opción (Volver)
+    - Elegir cuarta opción (Menu de reservas)
+    - Elegir primera opción (Crear reserva)
+    - Completar con el nombre de usuario recién creado
+    - Completar con el título del recurso recién creado
+    - Repetir procedimiento para el otro usuario
+    - Elegir última opción
+    - Elegir segunda opción (Menu recursos)
+    - Quinta opción (Utilizado para probar)
+    - Y a partir de aquí te llegarán las alertas para crear un prestamo
 
-3. **Alertas y Notificaciones**:
-   - Realizar un préstamo
-   - Esperar a que se acerque la fecha de vencimiento
-   - Verificar las alertas generadas
-   - Probar la renovación del préstamo
+3. **Alertas y Notificaciones**
+    - Realizar el 1 otra vez, pero con todas las preferencias activadas
 
 ## 🧩 Tecnologías y Herramientas
 
@@ -380,6 +427,11 @@ El uso de herramientas de IA en este trabajo práctico debe seguir las siguiente
    - La IA puede usarse para facilitar tu proceso de aprendizaje
    - Documentar tu proceso de desarrollo y decisiones tomadas
    - Mantener un registro de tu progreso y aprendizaje
+
+### Uso de la IA por parte del Alumno
+1. **Se utilizo en los menus**
+2. **Se utilizo en los inputs**
+3. **Se utilizo poco en concurrencia**
 
 ### Consecuencias del Uso Inadecuado
 El uso inadecuado de IA puede resultar en:
