@@ -36,11 +36,11 @@ public class GestorUsuarios extends Gestor {
             if (usuarios.values().stream().anyMatch(r -> r.getNombre().equalsIgnoreCase(nombre))) {
                 throw new RecursoNoDisponibleException("El usuario con el nombre '" + nombre + "' ya existe.");
             }
-            String email = ip.leerTexto("Email: ");
+            String email = ip.leerEmail("Email: ");
             if (usuarios.values().stream().anyMatch(r -> r.getEmail().equalsIgnoreCase(email))) {
                 throw new RecursoNoDisponibleException("El usuario con el email '" + email + "' ya existe.");
             }
-            String password = ip.leerTexto("Password: ");
+            String password = ip.leerContrasena("Password: ");
             Usuario nuevo = new Usuario(nombre, email, password);
             usuarios.put(nombre, nuevo);
             sistemaNotificaciones.notificarCreacionUsuario(nuevo);

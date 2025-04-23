@@ -33,10 +33,12 @@ public class SistemaVencimientos {
                 while (true) {
                     try{
                         Prestamo prestamo = colaPrestamos.take();
+                        System.out.println("1");
                         int vencimiento = comprobacionFechaDevolucion(prestamo.getFechaDevolucion());
+                        System.out.println("2: " + vencimiento);
                         switch (vencimiento){
-                            case 1 -> alertaVencimientos(prestamo);
-                            case 2 -> avisoVencimiento(prestamo);
+                            case 2 -> alertaVencimientos(prestamo);
+                            case 3 -> avisoVencimiento(prestamo);
                         }
                     }catch (InterruptedException e){
                         Thread.currentThread().interrupt();
@@ -49,32 +51,34 @@ public class SistemaVencimientos {
 
     private int comprobacionFechaDevolucion(LocalDateTime fechaDevolucion){
         LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, fechaDevolucion);
+        long daysDifference = Duration.between(now, fechaDevolucion).toDays();
 
-        long daysDifference = duration.toDays();
-        if (daysDifference == 1){
-            return 1;
-        }else if (daysDifference == 0){
-            return 0;
-        }else{
-            return 2;
+        if (daysDifference == 1) {
+            return 1; // Vence mañana
+        } else if (daysDifference == 0) {
+            return 2; // Vence hoy
+        } else if (daysDifference < 0) {
+            return 3; // Ya venció
+        } else {
+            return 0; // No vence pronto
         }
     }
 
     private void alertaVencimientos(Prestamo prestamo){
-        Prestable recurso = prestamo.getRecurso();
-        Usuario usuario = prestamo.getUsuario();
-        if (notificaciones.getPreferencia().isNotificarWarning()){
-            System.out.println("****************************************");
-            System.out.println("ALERTA: El préstamo vence mañana.");
-            System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-            System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-            System.out.println("Usuario: " + usuario.getNombre());
-            System.out.println("****************************************");
+        synchronized (System.out){
+            Prestable recurso = prestamo.getRecurso();
+            Usuario usuario = prestamo.getUsuario();
+            if (notificaciones.getPreferencia().isNotificarWarning()){
+                System.out.println("****************************************");
+                System.out.println("ALERTA: El préstamo vence mañana.");
+                System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+                System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+                System.out.println("Usuario: " + usuario.getNombre());
+                System.out.println("****************************************");
+            }
+            renovacionPrestamo(prestamo);
         }
 
-
-        renovacionPrestamo(prestamo);
     }
 
     public void renovacionPrestamo(Prestamo prestamo){
@@ -94,7 +98,7 @@ public class SistemaVencimientos {
         }while (!decision.equals("s") && !decision.equals("n"));
     }
 
-    public void avisoVencimiento(Prestamo prestamo){
+    public synchronized void avisoVencimiento(Prestamo prestamo){
         if (notificaciones.getPreferencia().isNotificarError()){
             Prestable recurso = prestamo.getRecurso();
             Usuario usuario = prestamo.getUsuario();

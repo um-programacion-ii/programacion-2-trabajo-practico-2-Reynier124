@@ -7,6 +7,7 @@ import Usuario.Usuario;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Input {
     private Scanner scanner;
@@ -107,5 +108,34 @@ public class Input {
         }
     }
 
+    public String leerEmail(String mensaje) {
+        String email;
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+
+        do {
+            email = leerTexto(mensaje);
+            if (!pattern.matcher(email).matches()) {
+                System.out.println("Correo electrónico inválido. Por favor, intente nuevamente.");
+            }
+        } while (!pattern.matcher(email).matches());
+
+        return email;
+    }
+
+    public String leerContrasena(String mensaje) {
+        String contrasena;
+
+        do {
+            contrasena = leerTexto(mensaje);
+            if (contrasena.length() < 4) {
+                System.out.println("La contraseña debe tener al menos 4 caracteres. Por favor, intente nuevamente.");
+            }
+        } while (contrasena.length() < 4);
+
+        return contrasena;
+    }
 }
+
+
 

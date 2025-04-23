@@ -23,19 +23,23 @@ public class SistemaDisponibilidad implements RecursoObserver {
         notificaciones.notificarInfo("La reserva del recurso '" + recurso.getTitulo() + "' ahora esta disponible.");
     }
 
+    public synchronized void realizarPrestamo(RecursoDigital recurso) {
+        String decision;
+        do {
+            decision = input.leerTexto("¿Le gustaría realizar un prestamo a este recurso? (S/N)").toLowerCase();
+            switch (decision) {
+                case "s" -> gestorPrestamos.solicitarPrestamo(recurso);
+                case "n" -> System.out.println("Entendido, no se realizará el préstamo.");
+                default -> System.out.println("Esa opcion no existe. Por favor intente de nuevo.");
+            }
+        }while(!decision.equals("s") && !decision.equals("n"));
+    };
+
     @Override
     public void actualizar(RecursoDigital recurso) {
         if (recurso.getEstado()== EstadoRecurso.RESERVADO){
             alertaDisponibilidad(recurso);
-            String decision;
-            do {
-                decision = input.leerTexto("¿Le gustaría realizar un prestamo a este recurso? (S/N)").toLowerCase();
-                switch (decision) {
-                    case "s" -> gestorPrestamos.solicitarPrestamo(recurso);
-                    case "n" -> System.out.println();
-                    default -> System.out.println("Esa opcion no existe. Por favor intente de nuevo.");
-                }
-            }while(!decision.equals("s") && !decision.equals("n"));
+            realizarPrestamo(recurso);
         }
 
     }

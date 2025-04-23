@@ -9,22 +9,42 @@ import Gestor.GestorRecursos;
 import Gestor.GestorUsuarios;
 import Util.Input;
 import Util.ReporteGenerator;
+import Util.ServicioNotificacionesEmail;
+import Util.ServicioNotificacionesSMS;
 
 import java.util.Scanner;
 
 public class Consola {
     private Scanner scanner;
-    private final ServicioNotificaciones notificaciones;
     private Input ip;
     private final GestorBiblioteca gestorBiblioteca;
     private final ReporteGenerator reporteGenerator;
 
-    public Consola(ServicioNotificaciones servicio, int hilos) {
+    public Consola(int hilos) {
         scanner = new Scanner(System.in);
-        this.notificaciones = servicio;
         ip = new Input(scanner);
-        gestorBiblioteca = new GestorBiblioteca(scanner, notificaciones, hilos);
+        gestorBiblioteca = new GestorBiblioteca(scanner, preguntarServicioNotifaciones(), hilos);
         reporteGenerator = new ReporteGenerator();
+    }
+
+    public ServicioNotificaciones preguntarServicioNotifaciones(){
+        System.out.println("¿Qué servicios de notificaciones le gustaría tener?");
+        System.out.println("1. Email");
+        System.out.println("2. SMS");
+        int decision;
+        do {
+            decision = ip.leerEntero("Seleccione una opcion: ");
+            switch (decision){
+                case 1 -> {
+                    return new ServicioNotificacionesEmail();
+                }
+                case 2 -> {
+                    return new ServicioNotificacionesSMS();
+                }
+                default -> System.out.println("Opcion invalida. Intente de nuevo");
+            }
+        }while (decision != 1 && decision !=2);
+        return null;
     }
 
     public void iniciar() {
@@ -45,7 +65,7 @@ public class Consola {
         gestorBiblioteca.terminar();
     }
 
-    private void mostrarMenuPrincipal() {
+    private synchronized void mostrarMenuPrincipal() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
         System.out.println("1. Sistema de usuarios");
         System.out.println("2. Sistema de recursos");
@@ -55,7 +75,7 @@ public class Consola {
         System.out.println("0. Salir");
     }
 
-    private void mostrarMenuRecursos() {
+    private synchronized void mostrarMenuRecursos() {
         System.out.println("\n--- MENÚ RECURSOS ---");
         System.out.println("1. Crear Recurso");
         System.out.println("2. Buscar Recurso");
@@ -87,7 +107,7 @@ public class Consola {
     }
 
 
-    private void mostrarMenuUsuarios() {
+    private synchronized void mostrarMenuUsuarios() {
         System.out.println("\n--- MENÚ USUARIOS ---");
         System.out.println("1. Crear Usuario");
         System.out.println("2. Buscar Usuario");
@@ -96,7 +116,7 @@ public class Consola {
         System.out.println("0. Salir");
     }
 
-    private void gestionarUsuarios() {
+    private synchronized void gestionarUsuarios() {
         int opcion;
         do {
             mostrarMenuUsuarios();
@@ -118,7 +138,7 @@ public class Consola {
         }while (opcion != 0);
     }
 
-    private void gestionarPrestamos() {
+    private synchronized void gestionarPrestamos() {
         int opcion;
         do {
             mostrarMenuPrestamos();
@@ -140,13 +160,15 @@ public class Consola {
         } while (opcion != 0);
     }
 
-    private void mostrarMenuPrestamos() {
-        System.out.println("\n--- MENÚ PRESTAMOS ---");
-        System.out.println("1. Crear Prestamo");
-        System.out.println("2. Buscar Prestamo");
-        System.out.println("3. Ordenar Lista de Prestamos");
-        System.out.println("4. Listar Prestamos");
-        System.out.println("0. Salir");
+    private  void mostrarMenuPrestamos() {
+        synchronized (System.out) {
+            System.out.println("\n--- MENÚ PRESTAMOS ---");
+            System.out.println("1. Crear Prestamo");
+            System.out.println("2. Buscar Prestamo");
+            System.out.println("3. Ordenar Lista de Prestamos");
+            System.out.println("4. Listar Prestamos");
+            System.out.println("0. Salir");
+        }
     }
 
     private void gestionarReservas() {
@@ -171,7 +193,7 @@ public class Consola {
         } while (opcion != 0);
     }
 
-    private void mostrarMenuReservas() {
+    private synchronized void mostrarMenuReservas() {
         System.out.println("\n--- MENÚ RESERVAS ---");
         System.out.println("1. Crear Reserva");
         System.out.println("2. Buscar Reserva");
@@ -197,7 +219,7 @@ public class Consola {
         }while (opcion != 0);
     }
 
-    private void mostrarMenuReportes(){
+    private synchronized void mostrarMenuReportes(){
         System.out.println("\n--- MENÚ REPORTES ---");
         System.out.println("1. Ver recursos más prestados");
         System.out.println("2. Ver recursos más reservados");
