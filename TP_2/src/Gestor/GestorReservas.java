@@ -1,5 +1,6 @@
 package Gestor;
 
+import Enum.EstadoRecurso;
 import Comparadores.ComparadorRecursoTitulo;
 import Comparadores.ComparadorUsuarioNombre;
 import Excepciones.RecursoNoDisponibleException;
@@ -8,9 +9,11 @@ import Interface.RecursoDigital;
 import Interface.ServicioNotificaciones;
 import Observer.ReservaObserver;
 import Reserva.Reservas;
+import Sistema.SistemaDisponibilidad;
 import Sistema.SistemaNotificaciones;
 import Sistema.SistemaReservas;
 import Usuario.Usuario;
+import Util.Input;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -18,19 +21,29 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class GestorReservas extends Gestor implements ReservaObserver {
+public class GestorReservas implements ReservaObserver {
     private final GestorUsuarios gestorUsuarios;
     private final GestorRecursos gestorRecursos;
     private List<Reservas> reservas;
+    private final Input ip;
+    private final Scanner sc;
     private final SistemaReservas sistemaReservas;
+    private final SistemaDisponibilidad sistemaDisponibilidad;
+    private final GestorPrestamos gestorPrestamos;
+    private final SistemaNotificaciones sistemaNotificaciones;
 
-    public GestorReservas(Scanner sc, ServicioNotificaciones notificaciones, GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, SistemaNotificaciones sistemaNotificaciones, int hilos) {
-        super(sc, notificaciones);
+    public GestorReservas(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, SistemaNotificaciones sistemaNotificaciones, GestorPrestamos gestorPrestamos, int hilos) {
+        this.sc = new Scanner(System.in);
+        this.ip = new Input(sc);
         reservas = new LinkedList<>();
+        this.sistemaNotificaciones = sistemaNotificaciones;
         this.gestorUsuarios = gestorUsuarios;
         this.gestorRecursos = gestorRecursos;
-        sistemaReservas = new SistemaReservas(sistemaNotificaciones,hilos);
+        this.gestorPrestamos = gestorPrestamos;
+        this.sistemaDisponibilidad = new SistemaDisponibilidad(sistemaNotificaciones, gestorPrestamos, this);
+        sistemaReservas = new SistemaReservas(sistemaNotificaciones, sistemaDisponibilidad,hilos);
         sistemaReservas.agregarObservador(this);
+
     }
 
     public List<Reservas> getReservas() {
@@ -41,22 +54,35 @@ public class GestorReservas extends Gestor implements ReservaObserver {
         this.reservas = reservas;
     }
 
-    @Override
+    public SistemaReservas getSistemaReservas() {
+        return sistemaReservas;
+    }
+
+    public SistemaDisponibilidad getSistemaDisponibilidad() {
+        return sistemaDisponibilidad;
+    }
+
     public void crear() {
         System.out.println("\n--- CREAR RESERVAS ---");
         Usuario usuario = conseguirUsuario();
+        if (usuario == null) {
+            System.out.println("Usuario no encontrado.");
+            return;
+        }
         RecursoDigital recurso = conseguirRecurso();
-        int prioridad = ip.leerEntero("Ingrese la prioridad: ");
+        if (recurso == null) {
+            System.out.println("Recurso no encontrado.");
+            return;
+        }
+        int prioridad = ip.leerPrioridad("Ingrese la prioridad: ");
         try{
             sistemaReservas.agregarReserva(usuario, (Prestable) recurso, prioridad);
         } catch (RecursoNoDisponibleException e) {
             System.out.println(e.getMessage());
         }
-
-        notificaciones.notificar("Reserva creada con exito");
+        sistemaNotificaciones.notificarInfo("Reserva creada con exito");
     }
 
-    @Override
     public void buscar() {
         System.out.println("\n--- BUSCAR RESERVAS ---");
         System.out.println("Introduzca los criterios de búsqueda (deje en blanco si no desea filtrar por ese criterio):");
@@ -85,7 +111,6 @@ public class GestorReservas extends Gestor implements ReservaObserver {
                                 ((RecursoDigital) p.getRecurso()).getTitulo().equalsIgnoreCase(tituloRecurso)))).toList();
     }
 
-    @Override
     public void ordenar() {
         int opcion;
         do {
@@ -189,6 +214,18 @@ public class GestorReservas extends Gestor implements ReservaObserver {
     public void actualizar(Reservas reserva) {
         reservas.add(reserva);
     }
+
+    public void eliminarReserva(Reservas reserva) {
+        List<Reservas> reservas = buscarReservas(reserva.getUsuario().getNombre(), ((RecursoDigital) reserva.getRecurso()).getTitulo());
+        if (reservas.size() > 1){
+            reservas.remove(reserva);
+        } else if (reservas.size() == 1) {
+            ((RecursoDigital) reserva.getRecurso()).setEstado(EstadoRecurso.DISPONIBLE);
+        }else {
+            System.out.println("Ha ocurrido un error");
+        }
+    }
+
 
     public void apagarSistema(){
         sistemaReservas.cerrar();

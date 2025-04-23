@@ -8,4 +8,5 @@ public interface Prestable {
     LocalDateTime getFechaDevolucion();
     void prestar(Usuario usuario);
     void reservar();
+    boolean estaDisponibleReservar();
 }

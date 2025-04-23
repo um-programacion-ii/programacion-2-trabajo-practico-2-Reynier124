@@ -6,16 +6,18 @@ import Interface.ServicioNotificaciones;
 import Sistema.SistemaNotificaciones;
 import Usuario.Usuario;
 import Comparadores.ComparadorUsuarioNombre;
+import Util.Input;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GestorUsuarios extends Gestor {
+public class GestorUsuarios{
     private Map<String, Usuario> usuarios;
     private final SistemaNotificaciones sistemaNotificaciones;
+    private Input ip;
 
-    public GestorUsuarios(Scanner sc, ServicioNotificaciones notificaciones, SistemaNotificaciones sistemaNotificaciones) {
-        super(sc, notificaciones);
+    public GestorUsuarios(SistemaNotificaciones sistemaNotificaciones) {
+        this.ip = new Input(new Scanner(System.in));
         usuarios = new LinkedHashMap<>();
         this.sistemaNotificaciones = sistemaNotificaciones;
     }
@@ -28,7 +30,6 @@ public class GestorUsuarios extends Gestor {
         this.usuarios = usuarios;
     }
 
-    @Override
     public void crear(){
         System.out.println("\n--- CREAR USUARIO ---");
         String nombre = ip.leerTexto("Nombre: ");
@@ -36,11 +37,11 @@ public class GestorUsuarios extends Gestor {
             if (usuarios.values().stream().anyMatch(r -> r.getNombre().equalsIgnoreCase(nombre))) {
                 throw new RecursoNoDisponibleException("El usuario con el nombre '" + nombre + "' ya existe.");
             }
-            String email = ip.leerTexto("Email: ");
+            String email = ip.leerEmail("Email: ");
             if (usuarios.values().stream().anyMatch(r -> r.getEmail().equalsIgnoreCase(email))) {
                 throw new RecursoNoDisponibleException("El usuario con el email '" + email + "' ya existe.");
             }
-            String password = ip.leerTexto("Password: ");
+            String password = ip.leerContrasena("Password: ");
             Usuario nuevo = new Usuario(nombre, email, password);
             usuarios.put(nombre, nuevo);
             sistemaNotificaciones.notificarCreacionUsuario(nuevo);
@@ -50,7 +51,7 @@ public class GestorUsuarios extends Gestor {
             System.out.println("Ocurrió un error inesperado:" + e.getMessage());
         }
     }
-    @Override
+
     public void buscar(){
         String nombre = null;
         Integer id = null;
@@ -96,7 +97,7 @@ public class GestorUsuarios extends Gestor {
         }
     };
 
-    @Override
+
     public void ordenar(){
         int opcion;
         do {

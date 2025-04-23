@@ -46,11 +46,12 @@ public abstract class RecursoBase implements RecursoDigital, Prestable, Renovabl
         return estado;
     }
 
-    public void setEstado(EstadoRecurso estado) {
-        if (this.estado == EstadoRecurso.RESERVADO && estado == EstadoRecurso.DISPONIBLE){
+    public void setEstado(EstadoRecurso nuevoEstado) {
+        if (this.estado == EstadoRecurso.RESERVADO && nuevoEstado == EstadoRecurso.DISPONIBLE){
+            System.out.println("1");
             notificarObservadores();
         }
-        this.estado = estado;
+        this.estado = nuevoEstado;
         if (estado == EstadoRecurso.DISPONIBLE) {
             notificarObservadores();
         }
@@ -95,8 +96,12 @@ public abstract class RecursoBase implements RecursoDigital, Prestable, Renovabl
     }
 
     @Override
+    public boolean estaDisponibleReservar(){return estado == EstadoRecurso.DISPONIBLE || estado == EstadoRecurso.RESERVADO;}
+
+    @Override
     public LocalDateTime getFechaDevolucion() {
-        return LocalDateTime.now().plusDays(14);
+        //return LocalDateTime.now().plusDays(14);
+        return LocalDateTime.now().plusDays(1);
     }
 
     @Override

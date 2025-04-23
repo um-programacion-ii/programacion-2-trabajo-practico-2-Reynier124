@@ -1,5 +1,6 @@
 package Sistema;
 
+import Enum.NivelUrgencia;
 import Interface.Prestable;
 import Interface.RecursoDigital;
 import Interface.Renovable;
@@ -10,21 +11,20 @@ import Util.Input;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 public class SistemaVencimientos {
     private final BlockingQueue<Prestamo> colaPrestamos;
     private final ExecutorService procesadorVencimientos;
     private Input input;
+    private final SistemaNotificaciones notificaciones;
 
 
-    public SistemaVencimientos(int hilos) {
+    public SistemaVencimientos(SistemaNotificaciones notifaciones, int hilos) {
         this.colaPrestamos = new LinkedBlockingQueue<>();
         this.procesadorVencimientos = Executors.newFixedThreadPool(hilos);
         this.input = new Input(new Scanner(System.in));
+        this.notificaciones = notifaciones;
         iniciarProcesamiento();
     }
 
@@ -36,8 +36,8 @@ public class SistemaVencimientos {
                         Prestamo prestamo = colaPrestamos.take();
                         int vencimiento = comprobacionFechaDevolucion(prestamo.getFechaDevolucion());
                         switch (vencimiento){
-                            case 1 -> alertaVencimientos(prestamo);
-                            case 2 -> avisoVencimiento(prestamo);
+                            case 2 -> alertaVencimientos(prestamo);
+                            case 3 -> avisoVencimiento(prestamo);
                         }
                     }catch (InterruptedException e){
                         Thread.currentThread().interrupt();
@@ -50,29 +50,34 @@ public class SistemaVencimientos {
 
     private int comprobacionFechaDevolucion(LocalDateTime fechaDevolucion){
         LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, fechaDevolucion);
+        long daysDifference = Duration.between(now, fechaDevolucion).toDays();
 
-        long daysDifference = duration.toDays();
-        if (daysDifference == 1){
-            return 1;
-        }else if (daysDifference == 0){
-            return 0;
-        }else{
-            return 2;
+        if (daysDifference == 1) {
+            return 1; // Vence mañana
+        } else if (daysDifference == 0) {
+            return 2; // Vence hoy
+        } else if (daysDifference < 0) {
+            return 3; // Ya venció
+        } else {
+            return 0; // No vence pronto
         }
     }
 
     private void alertaVencimientos(Prestamo prestamo){
-        Prestable recurso = prestamo.getRecurso();
-        Usuario usuario = prestamo.getUsuario();
-        System.out.println("****************************************");
-        System.out.println("ALERTA: El préstamo vence mañana.");
-        System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-        System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-        System.out.println("Usuario: " + usuario.getNombre());
-        System.out.println("****************************************");
+        synchronized (System.out){
+            Prestable recurso = prestamo.getRecurso();
+            Usuario usuario = prestamo.getUsuario();
+            if (notificaciones.getPreferencia().isNotificarWarning()){
+                System.out.println("****************************************");
+                System.out.println("ALERTA: El préstamo vence mañana.");
+                System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+                System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+                System.out.println("Usuario: " + usuario.getNombre());
+                System.out.println("****************************************");
+            }
+            renovacionPrestamo(prestamo);
+        }
 
-        renovacionPrestamo(prestamo);
     }
 
     public void renovacionPrestamo(Prestamo prestamo){
@@ -83,6 +88,7 @@ public class SistemaVencimientos {
             switch (decision){
                 case "s" -> {
                     ((Renovable) recurso).renovar();
+                    colaPrestamos.add(prestamo);
                 }
                 case "n" -> {
                     System.out.println("Entonces por favor entregar el recurso a la biblioteca en el transcurso de 24 horas");
@@ -93,14 +99,42 @@ public class SistemaVencimientos {
     }
 
     public void avisoVencimiento(Prestamo prestamo){
-        Prestable recurso = prestamo.getRecurso();
-        Usuario usuario = prestamo.getUsuario();
-        System.out.println("****************************************");
-        System.out.println("ALERTA: Ha vencido");
-        System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
-        System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
-        System.out.println("Usuario: " + usuario.getNombre());
-        System.out.println("****************************************");
+        synchronized (System.out){
+            if (notificaciones.getPreferencia().isNotificarError()){
+                Prestable recurso = prestamo.getRecurso();
+                Usuario usuario = prestamo.getUsuario();
+                System.out.println("****************************************");
+                System.out.println("ALERTA: Ha vencido");
+                System.out.println("Recurso: " + ((RecursoDigital) recurso).getTitulo());
+                System.out.println("Fecha de devolución: " + recurso.getFechaDevolucion());
+                System.out.println("Usuario: " + usuario.getNombre());
+                System.out.println("****************************************");
+                notificaciones.guardarRecordatorio("Ha vencido el recurso "+ ((RecursoDigital) recurso).getTitulo(), NivelUrgencia.ERROR);
+            }
+
+        }
+
+
+    }
+
+    public BlockingQueue<Prestamo> getColaPrestamos() {
+        return colaPrestamos;
+    }
+
+    public void cerrar(){
+        try {
+            procesadorVencimientos.shutdown();
+            if (!procesadorVencimientos.awaitTermination(1, TimeUnit.SECONDS)) {
+                procesadorVencimientos.shutdownNow();
+
+                if (!procesadorVencimientos.awaitTermination(1, TimeUnit.SECONDS)) {
+                    System.err.println("Algunas tareas no se terminaron correctamente.");
+                }
+            }
+        } catch (InterruptedException e) {
+            procesadorVencimientos.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

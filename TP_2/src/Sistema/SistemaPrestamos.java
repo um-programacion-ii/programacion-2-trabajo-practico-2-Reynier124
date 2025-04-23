@@ -21,7 +21,7 @@ public class SistemaPrestamos {
         this.colaSolicitudes = new LinkedBlockingQueue<>();
         this.procesadorPrestamos = Executors.newFixedThreadPool(hilos);
         this.sistemaNotificaciones = sistemaNotificaciones;
-        this.sistemaVencimientos = new SistemaVencimientos(hilos);
+        this.sistemaVencimientos = new SistemaVencimientos(sistemaNotificaciones, hilos);
         iniciarProcesamiento();
     }
 
@@ -41,14 +41,16 @@ public class SistemaPrestamos {
         }
     }
 
-    public void solicitarPrestamo(Usuario usuario, Prestable recurso) throws RecursoNoDisponibleException {
-        if (recurso.estaDisponible()){
+    public void solicitarPrestamo(Usuario usuario, Prestable recurso)  {
+        if (recurso.estaDisponibleReservar()){
             Prestamo prestamo = new Prestamo(usuario, recurso, recurso.getFechaDevolucion());
             colaSolicitudes.add(prestamo);
             sistemaNotificaciones.notificarDisponibilidadPrestamo(prestamo);
         }else {
-            throw new RecursoNoDisponibleException("El recurso no está disponible para préstamo.");
+            System.out.println("El recurso esta no disponible");
         }
+
+
     }
 
     private void procesarPrestamo(Prestamo prestamo) {
@@ -56,6 +58,7 @@ public class SistemaPrestamos {
         Usuario usuario = prestamo.getUsuario();
         usuario.reporte();
         recurso.prestar(usuario);
+        sistemaVencimientos.getColaPrestamos().add(prestamo);
         sistemaNotificaciones.notificarProcesamientoPrestamo(prestamo);
         notificarObservadores(prestamo);
     }
@@ -83,6 +86,7 @@ public class SistemaPrestamos {
     public void cerrar() {
         try {
             procesadorPrestamos.shutdown();
+            sistemaVencimientos.cerrar();
             if (!procesadorPrestamos.awaitTermination(1, TimeUnit.SECONDS)) {
                 procesadorPrestamos.shutdownNow();
 
